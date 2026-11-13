@@ -26,8 +26,14 @@ systemctl enable --now mariadb
 systemctl enable --now php8.4-fpm
 
 # 4. Setup Database MariaDB
+echo "Mengatur database dan user MariaDB..."
 mariadb -e "CREATE DATABASE IF NOT EXISTS web_scan_logistik CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mariadb -e "GRANT ALL PRIVILEGES ON web_scan_logistik.* TO 'root'@'localhost';"
+mariadb -e "CREATE USER IF NOT EXISTS 'logistik'@'127.0.0.1' IDENTIFIED BY 'logistik123';"
+mariadb -e "CREATE USER IF NOT EXISTS 'logistik'@'localhost' IDENTIFIED BY 'logistik123';"
+mariadb -e "ALTER USER 'logistik'@'127.0.0.1' IDENTIFIED BY 'logistik123';"
+mariadb -e "ALTER USER 'logistik'@'localhost' IDENTIFIED BY 'logistik123';"
+mariadb -e "GRANT ALL PRIVILEGES ON web_scan_logistik.* TO 'logistik'@'127.0.0.1';"
+mariadb -e "GRANT ALL PRIVILEGES ON web_scan_logistik.* TO 'logistik'@'localhost';"
 mariadb -e "FLUSH PRIVILEGES;"
 
 # 5. Install Composer jika belum ada
@@ -70,8 +76,8 @@ DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=web_scan_logistik
-DB_USERNAME=root
-DB_PASSWORD=
+DB_USERNAME=logistik
+DB_PASSWORD=logistik123
 
 SESSION_DRIVER=database
 SESSION_LIFETIME=15
@@ -83,16 +89,19 @@ QUEUE_CONNECTION=database
 EOF
 
 # 8. Install Dependency PHP via Composer
+cd "$APP_DIR"
 export COMPOSER_ALLOW_SUPERUSER=1
 composer install --no-dev --optimize-autoloader --no-interaction
 
 # 9. Restore Database Lengkap
 if [ -f "$APP_DIR/database/dump_logistik.sql" ]; then
     echo "Mengimpor data database lengkap..."
-    mariadb --binary-mode=1 -u root web_scan_logistik < "$APP_DIR/database/dump_logistik.sql" || true
+    mariadb --binary-mode=1 -u root web_scan_logistik < "$APP_DIR/database/dump_logistik.sql" || \
+    mariadb --binary-mode=1 -u logistik -plogistik123 -h 127.0.0.1 web_scan_logistik < "$APP_DIR/database/dump_logistik.sql" || true
 fi
 
-# Jalankan migrasi terbaru untuk memastikan tidak ada kolom terlewat
+# Bersihkan cache lama lalu jalankan migrasi database
+php artisan config:clear
 php artisan migrate --force
 
 # Storage Link & Optimization
