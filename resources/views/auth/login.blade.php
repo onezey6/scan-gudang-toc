@@ -13,19 +13,23 @@
             font-family: 'JetBrains Mono', monospace;
             background-color: #040c10;
             background-image:
-                linear-gradient(rgba(34, 211, 238, 0.032) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 211, 238, 0.032) 1px, transparent 1px),
-                radial-gradient(circle at 50% 44%, rgba(20, 184, 166, 0.16) 0%, rgba(6, 182, 212, 0.06) 38%, rgba(4, 12, 16, 0.96) 72%);
-            background-size: 42px 42px, 42px 42px, 100% 100%;
+                linear-gradient(to bottom, rgba(4, 12, 16, 0.50) 0%, rgba(4, 12, 16, 0.30) 40%, rgba(4, 12, 16, 0.75) 100%),
+                url('{{ asset('images/bg-login.jpg') }}');
+            background-size: cover;
+            background-position: center bottom;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
         }
 
         .toc-card {
-            background: linear-gradient(180deg, rgba(9, 25, 34, 0.92) 0%, rgba(7, 19, 27, 0.95) 100%);
-            border: 1px solid rgba(34, 211, 238, 0.30);
+            background: linear-gradient(180deg, rgba(8, 20, 34, 0.86) 0%, rgba(5, 14, 24, 0.92) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(34, 211, 238, 0.42);
             box-shadow:
-                0 0 55px -12px rgba(6, 182, 212, 0.25),
-                0 25px 50px -12px rgba(0, 0, 0, 0.75),
-                inset 0 1px 0 rgba(103, 232, 249, 0.18);
+                0 0 60px -10px rgba(6, 182, 212, 0.40),
+                0 30px 60px -15px rgba(0, 0, 0, 0.88),
+                inset 0 1px 0 rgba(103, 232, 249, 0.28);
         }
 
         .toc-logo-ring {
