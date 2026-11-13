@@ -381,9 +381,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Ketentuan & Syarat Pinjam Pakai (Dapat Disesuaikan)</label>
-                    <textarea name="terms_conditions" rows="6"
-                              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs leading-relaxed">{{ old('terms_conditions', $defaultTerms) }}</textarea>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">
+                        {{ $docType === 'bap' ? 'Ketentuan & Syarat Pengembalian Barang (BAP - Dapat Disesuaikan)' : 'Ketentuan & Syarat Pinjam Pakai Barang Logistik (BAST - Dapat Disesuaikan)' }}
+                    </label>
+                    <textarea name="terms_conditions" rows="7"
+                              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs leading-relaxed font-mono-code">{{ old('terms_conditions', $defaultTerms) }}</textarea>
                 </div>
 
                 <div>
@@ -426,26 +428,29 @@
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
                 <div>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-900">5. Upload Foto Bukti Dokumentasi (Tidak Terbatas / Unlimited Photos)</h3>
-                    <p class="text-xs text-slate-500">Lampirkan foto fisik barang, foto penyerahan, atau kondisi kelengkapan sebanyak yang diperlukan</p>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm sm:text-base font-bold text-slate-900">5. Upload Foto Bukti Dokumentasi Barang (Tidak Terbatas / Unlimited)</h3>
+                        <span id="total-photos-counter" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-300">0 Foto Terpilih</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">Lampirkan foto fisik barang, foto serah terima, kondisi kelengkapan, atau bukti serah terima sebanyak yang diperlukan tanpa batas</p>
                 </div>
                 <button type="button" onclick="addEvidencePhotoSlot()"
-                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0">
-                    <span>+ Tambah Slot Foto Bukti Lagi</span>
+                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0 shadow-sm active:scale-95 transition-all">
+                    <span>+ Tambah Slot / Foto Baru</span>
                 </button>
             </div>
 
             <div id="evidence-photos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <div class="evidence-photo-slot p-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex flex-col gap-2">
-                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
-                        <span>Foto Bukti #1</span>
+                <div class="evidence-photo-slot p-3.5 rounded-xl border-2 border-dashed border-emerald-300/80 bg-emerald-50/20 flex flex-col gap-2">
+                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                        <span>Foto Bukti #1 (Mendukung Multi-Select)</span>
                     </div>
                     <input type="file" name="evidence_photos[]" accept="image/jpeg,image/png,image/webp" multiple
                            onchange="previewEvidenceFiles(this)"
                            class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white hover:file:bg-emerald-600 cursor-pointer">
-                    <input type="text" name="evidence_captions[]" placeholder="Keterangan foto (misal: Kondisi fisik HT & antena)..."
+                    <input type="text" name="evidence_captions[]" placeholder="Keterangan foto (misal: Kondisi fisik barang & kelengkapan)..."
                            class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white">
-                    <div class="evidence-preview-thumbs flex flex-wrap gap-1.5"></div>
+                    <div class="evidence-preview-thumbs flex flex-wrap gap-2 pt-1"></div>
                 </div>
             </div>
         </div>
@@ -548,19 +553,37 @@
         btn.closest('tr').remove();
     }
 
+    function updateTotalPhotosCounter() {
+        var total = 0;
+        document.querySelectorAll('input[name="evidence_photos[]"]').forEach(function (inp) {
+            if (inp.files) {
+                total += inp.files.length;
+            }
+        });
+        var counter = document.getElementById('total-photos-counter');
+        if (counter) {
+            counter.textContent = total + ' Foto Terpilih';
+            if (total > 0) {
+                counter.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow-sm';
+            } else {
+                counter.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-300';
+            }
+        }
+    }
+
     function addEvidencePhotoSlot() {
         photoSlotCounter++;
         var container = document.getElementById('evidence-photos-container');
         var div = document.createElement('div');
-        div.className = 'evidence-photo-slot p-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex flex-col gap-2';
+        div.className = 'evidence-photo-slot p-3.5 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex flex-col gap-2';
         div.innerHTML =
-            '<div class="flex items-center justify-between text-[11px] font-bold text-slate-600">' +
-                '<span>Foto Bukti #' + photoSlotCounter + '</span>' +
-                '<button type="button" onclick="this.closest(\'.evidence-photo-slot\').remove()" class="text-rose-600 hover:underline">Hapus Slot</button>' +
+            '<div class="flex items-center justify-between text-[11px] font-bold text-slate-700">' +
+                '<span>Foto Bukti #' + photoSlotCounter + ' (Mendukung Multi-Select)</span>' +
+                '<button type="button" onclick="this.closest(\'.evidence-photo-slot\').remove(); updateTotalPhotosCounter();" class="text-rose-600 hover:underline">Hapus Slot</button>' +
             '</div>' +
             '<input type="file" name="evidence_photos[]" accept="image/jpeg,image/png,image/webp" multiple onchange="previewEvidenceFiles(this)" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-900 file:text-white hover:file:bg-emerald-600 cursor-pointer">' +
             '<input type="text" name="evidence_captions[]" placeholder="Keterangan foto bukti..." class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white">' +
-            '<div class="evidence-preview-thumbs flex flex-wrap gap-1.5"></div>';
+            '<div class="evidence-preview-thumbs flex flex-wrap gap-2 pt-1"></div>';
         container.appendChild(div);
     }
 
@@ -570,17 +593,22 @@
         var thumbs = slot.querySelector('.evidence-preview-thumbs');
         if (!thumbs) return;
         thumbs.innerHTML = '';
-        if (!input.files) return;
-        Array.from(input.files).forEach(function (file) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                var img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'w-14 h-14 rounded-lg object-cover border border-slate-200';
-                thumbs.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        });
+        if (input.files && input.files.length > 0) {
+            Array.from(input.files).forEach(function (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var thumbWrapper = document.createElement('div');
+                    thumbWrapper.className = 'relative group w-14 h-14 rounded-lg overflow-hidden border border-slate-300 shadow-2xs';
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-full object-cover';
+                    thumbWrapper.appendChild(img);
+                    thumbs.appendChild(thumbWrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        updateTotalPhotosCounter();
     }
 
     // Simple Signature Pad Implementation

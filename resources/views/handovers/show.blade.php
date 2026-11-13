@@ -145,11 +145,11 @@
             </div>
         </div>
 
-        <!-- Ketentuan & Kewajiban Pinjam Pakai -->
+        <!-- Ketentuan & Kewajiban Pinjam Pakai / Pengembalian -->
         @if ($handover->terms_conditions)
             <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
-                <strong class="block text-slate-900 uppercase tracking-wider mb-1.5">Ketentuan & Kewajiban Pinjam Pakai:</strong>
-                <div class="whitespace-pre-line leading-relaxed">{{ $handover->terms_conditions }}</div>
+                <strong class="block text-slate-900 uppercase tracking-wider mb-1.5">{{ $handover->document_type === 'bap' ? 'Ketentuan & Syarat Pengembalian Barang (BAP):' : 'Ketentuan & Kewajiban Pinjam Pakai Barang (BAST):' }}</strong>
+                <div class="whitespace-pre-line leading-relaxed font-mono-code">{{ $handover->terms_conditions }}</div>
             </div>
         @endif
 

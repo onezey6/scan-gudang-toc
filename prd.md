@@ -356,3 +356,6 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   4. Penyediaan penanganan error ramah (*graceful fallback*) dan polling kesiapan pustaka `Html5Qrcode`.
 - **2026-11-13 (Penyempurnaan Navigasi Sidebar & Drawer - Clean Minimalist HUD):**
   Menghilangkan nomor indeks kurung siku `[01]`..`[08]` dan simbol garis miring ganda `//` pada seksi menu di Sidebar Desktop dan Mobile Drawer. Tampilan menjadi jauh lebih bersih, modern, dan memberikan ruang horizontal yang lebih lapang bagi label menu dan ikon berwarna.
+- **2026-11-13 (Penyempurnaan Ketentuan Meminjam & Mengembalikan serta Upload Foto Bukti Tanpa Batas):**
+  1. Pemisahan pasal kedinasan resmi antara **Ketentuan Meminjam (BAST - 6 Pasal)** dan **Ketentuan Pengembalian (BAP - 5 Pasal)** secara otomatis pada model `HandoverDocument`, form input, detail dokumen, dan cetakan fisik PDF/Print.
+  2. Peningkatan sistem upload foto bukti dokumentasi fisik barang menjadi tanpa batasan kuantitas (*unlimited multi-photo upload*) dengan fitur multi-select langsung dari kamera HP/galeri, pratinjau thumbnail instan, penghitung jumlah foto terpilih (*total photos counter*), dan pemrosesan rekursif tangguh di `HandoverController`.
