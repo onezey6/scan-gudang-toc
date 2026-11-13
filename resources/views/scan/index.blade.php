@@ -356,6 +356,100 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Panduan Kamera HP (Koneksi Wi-Fi HTTP) -->
+    <div id="modal-camera-http-guide" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-[#0B1120] text-white border-2 border-cyan-500/40 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+            <div class="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-white">Panduan Kamera HP di Jaringan Wi-Fi</h3>
+                        <p class="text-[11px] text-slate-400">Batasan Keamanan Browser HP pada Alamat HTTP</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCameraHttpModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="mt-4 space-y-4 text-xs">
+                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 leading-relaxed">
+                    Browser HP (Chrome/Safari) secara default <strong>membatasi live video streaming</strong> pada koneksi lokal non-HTTPS <span id="camera-error-detail" class="text-[10px] opacity-80"></span>.
+                </div>
+
+                <!-- Solusi Utama: Buka via HTTPS (Langsung Live Tanpa Foto & Tanpa Setting) -->
+                <div class="p-4 rounded-xl bg-gradient-to-r from-cyan-950/80 to-blue-950/80 border border-cyan-400/50 space-y-2.5">
+                    <div class="flex items-center gap-2 text-cyan-300 font-extrabold text-xs uppercase tracking-wider">
+                        <span class="px-2 py-0.5 rounded-full bg-cyan-400 text-slate-950 text-[10px] font-black">SOLUSI LIVE OTOMATIS</span>
+                        Live Video Kamera Langsung Menyala
+                    </div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed">
+                        Cukup buka sistem menggunakan alamat aman <strong>HTTPS</strong> pada link di bawah ini. Browser HP otomatis mengizinkan kamera live streaming terus-menerus tanpa perlu jepret foto.
+                    </p>
+                    <a href="https://192.168.0.114/web%20scan%20logistik/public/scan?autostart=camera"
+                       class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-2 text-center">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>BUKA MODE KAMERA LIVE (HTTPS://192.168.0.114)</span>
+                    </a>
+                    <div class="text-[10px] text-cyan-300/80 italic text-center">
+                        *Jika muncul "Connection not private", klik Lanjutan (Advanced) &rarr; Lanjutkan (Proceed).
+                    </div>
+                </div>
+
+                <!-- Solusi 2: Tombol Foto Barcode (Alternatif Cepat) -->
+                <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
+                    <div class="flex items-center gap-2 text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black">SOLUSI ALTERNATIF</span>
+                        Jepret Foto Barcode
+                    </div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed">
+                        Jika tetap ingin di alamat HTTP biasa, Anda dapat menggunakan tombol <strong>Foto Barcode</strong>.
+                    </p>
+                    <button type="button" onclick="triggerNativeCameraFromModal()"
+                            class="w-full py-2 px-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>AMBIL FOTO BARCODE</span>
+                    </button>
+                </div>
+
+                <!-- Solusi 2: Aktifkan Live Stream di Chrome Flags -->
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-extrabold text-cyan-400 text-xs">SOLUSI 2 • JIKA INGIN LIVE STREAM VIDEO MENYALA TERUS</span>
+                    </div>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        Cukup izinkan alamat web ini di Chrome HP sekali saja (hanya butuh 15 detik):
+                    </p>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-300 text-[11px]">
+                        <li>Buka tab baru di Chrome HP, ketik: <code class="text-amber-300 font-mono font-bold select-all">chrome://flags</code></li>
+                        <li>Cari: <strong class="text-white">Insecure origins treated as secure</strong></li>
+                        <li>
+                            Masukkan:
+                            <code class="text-cyan-300 font-mono font-bold select-all bg-slate-950 px-1.5 py-0.5 rounded border border-slate-700">http://192.168.0.114:8000</code>
+                            <button type="button" onclick="copyLanOrigin()" class="ml-1 text-[10px] text-teal-400 underline font-bold hover:text-teal-300">Salin</button>
+                        </li>
+                        <li>Ubah pilihan dari <em>Disabled</em> menjadi <strong class="text-emerald-400">Enabled</strong> lalu klik tombol <strong class="text-white">Relaunch</strong> di pojok kanan bawah.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+                <button type="button" onclick="closeCameraHttpModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all">
+                    Tutup Panduan
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
