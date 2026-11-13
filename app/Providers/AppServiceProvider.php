@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Paksa skema HTTPS jika diakses melalui reverse proxy / tunnel SSL (Pinggy, Cloudflare, dll)
+        if (request()->header('x-forwarded-proto') === 'https' || request()->isSecure()) {
+            URL::forceScheme('https');
+        }
     }
 }
