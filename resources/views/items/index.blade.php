@@ -91,9 +91,10 @@
         </div>
     </form>
 
-    <!-- Master Items Table -->
+    <!-- Master Items Table (Desktop) & Smart Mobile Cards (Mobile) -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- TAMPILAN TABEL KHUSUS KOMPUTER / DESKTOP (MD+) -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse table-fluid">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -245,6 +246,108 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <!-- TAMPILAN KARTU CERDAS KHUSUS PONSEL / SMARTPHONE (MD HIDDEN) -->
+        <div class="md:hidden divide-y divide-slate-100 p-3 space-y-3">
+            @forelse ($items as $item)
+                <div class="card-elevated bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-3">
+                    <!-- Atas: Foto, Nama, Kode SKU, Kategori & Status -->
+                    <div class="flex items-start gap-3">
+                        @if ($item->photo_url)
+                            <button type="button"
+                                    onclick="openPhotoLightbox('{{ $item->photo_url }}', '{{ addslashes($item->name) }}')"
+                                    title="Klik untuk perbesar foto barang"
+                                    class="w-14 h-14 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs group relative">
+                                <img src="{{ $item->photo_url }}" alt="{{ $item->name }}" class="w-full h-full object-cover">
+                            </button>
+                        @else
+                            <div class="w-14 h-14 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 flex flex-col items-center justify-center shrink-0 text-[10px] font-semibold">
+                                <svg class="w-5 h-5 mb-0.5 opacity-60" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>NO IMG</span>
+                            </div>
+                        @endif
+
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="font-mono-code text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/80">{{ $item->item_code }}</span>
+                                @php $avStatus = $item->availability_status ?? 'sedia'; @endphp
+                                @if ($avStatus === 'sedia')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Sedia
+                                    </span>
+                                @elseif ($avStatus === 'sedang_keluar')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Sedang Keluar
+                                    </span>
+                                @elseif ($avStatus === 'sedang_dipakai')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-800 border border-cyan-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>Dipakai
+                                    </span>
+                                @elseif ($avStatus === 'sedang_dipinjam')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Dipinjam
+                                    </span>
+                                @endif
+                            </div>
+
+                            <h4 class="font-bold text-slate-900 text-sm mt-1 leading-snug">{{ $item->name }}</h4>
+                            <div class="text-[11px] text-slate-500 mt-0.5">
+                                {{ $item->category?->name ?? 'Tanpa Kategori' }}
+                                @if ($item->brand) • {{ $item->brand }} @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tengah: Barcode Mini + Info Stok Fisik & Lokasi Rak -->
+                    <div class="p-2.5 rounded-xl bg-slate-50/90 border border-slate-200/80 flex items-center justify-between gap-2.5">
+                        <div class="keep-light bg-white px-2 py-1 rounded-lg border border-slate-200 shrink-0 shadow-2xs">
+                            <svg class="js-barcode max-w-[105px] h-auto block" data-barcode="{{ $item->barcode }}" data-height="18" data-width="0.9" data-fontsize="8" data-margin="1"></svg>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-400 uppercase font-semibold leading-none">Stok Fisik:</div>
+                            <div class="text-lg font-extrabold {{ $item->isLowStock() ? 'text-rose-600' : 'text-slate-900' }} leading-tight mt-0.5">
+                                {{ number_format($item->stock) }} <span class="text-xs font-normal text-slate-500">{{ $item->unit }}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500 mt-0.5">
+                                Rak: <strong class="text-slate-700">{{ $item->storage_location ?: 'Gudang Utama' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bawah: Tombol Aksi Sentuh Ergonomis Jempol -->
+                    <div class="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100">
+                        <a href="{{ route('scan.index', ['barcode' => $item->barcode, 'mode' => 'in']) }}"
+                           class="py-2.5 px-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                            </svg>
+                            <span>Scan</span>
+                        </a>
+                        <a href="{{ route('items.barcode-studio', ['item_id' => $item->id]) }}"
+                           class="py-2.5 px-2 rounded-xl bg-slate-800 text-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs active:scale-95">
+                            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                            </svg>
+                            <span>Stiker</span>
+                        </a>
+                        <button type="button"
+                                onclick="openEditModal({{ json_encode($item) }})"
+                                class="py-2.5 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 border border-slate-200">
+                            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            <span>Ubah</span>
+                        </button>
+                    </div>
+                </div>
+            @empty
+                <div class="py-12 text-center text-slate-400 text-xs">
+                    Belum ada barang di database.
+                </div>
+            @endforelse
         </div>
 
         @if ($items->hasPages())

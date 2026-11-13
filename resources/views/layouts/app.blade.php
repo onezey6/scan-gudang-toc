@@ -286,18 +286,83 @@
     @php
         $menuSections = [
             'Operasional Utama' => [
-                ['route' => 'dashboard', 'active' => 'dashboard', 'code' => '01', 'label' => 'Dashboard Analitik', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
-                ['route' => 'scan.index', 'active' => 'scan.*', 'code' => '02', 'label' => 'Scan Barcode (In/Out)', 'live' => true, 'icon' => 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z'],
-                ['route' => 'items.index', 'active' => 'items.index', 'code' => '03', 'label' => 'Data Barang & Gudang', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
-                ['route' => 'items.barcode-studio', 'active' => 'items.barcode-studio', 'code' => '04', 'label' => 'Studio Pembuat Barcode', 'icon' => 'M4 6h2v12H4V6zm4 0h1v12H8V6zm3 0h3v12h-3V6zm5 0h1v12h-1V6zm3 0h1v12h-1V6z'],
+                [
+                    'route' => 'dashboard',
+                    'active' => 'dashboard',
+                    'code' => '01',
+                    'label' => 'Dashboard Analitik',
+                    'icon' => 'M3 4a1 1 0 011-1h5a1 1 0 011 1v7a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm11-1a1 1 0 011-1h5a1 1 0 011 1v4a1 1 0 01-1 1h-5a1 1 0 01-1-1V3zm0 9a1 1 0 011-1h5a1 1 0 011 1v7a1 1 0 01-1 1h-5a1 1 0 01-1-1v-7zM3 16a1 1 0 011-1h5a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4z',
+                    'color' => 'text-cyan-400',
+                    'bg' => 'bg-cyan-500/15 border-cyan-400/30 text-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.25)]',
+                ],
+                [
+                    'route' => 'scan.index',
+                    'active' => 'scan.*',
+                    'code' => '02',
+                    'label' => 'Scan Barcode (In/Out)',
+                    'live' => true,
+                    'icon' => 'M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2M3 17v2a2 2 0 002 2h2m10 0h2a2 2 0 002-2v-2M2 12h20M7 8v2m3-2v2m4-2v2m3-2v2m-10 4v2m3-2v2m4-2v2m3-2v2',
+                    'color' => 'text-emerald-400',
+                    'bg' => 'bg-emerald-500/15 border-emerald-400/30 text-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.25)]',
+                ],
+                [
+                    'route' => 'items.index',
+                    'active' => 'items.index',
+                    'code' => '03',
+                    'label' => 'Data Barang & Gudang',
+                    'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4M12 11l4-2M8 9l4 2',
+                    'color' => 'text-amber-400',
+                    'bg' => 'bg-amber-500/15 border-amber-400/30 text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.25)]',
+                ],
+                [
+                    'route' => 'items.barcode-studio',
+                    'active' => 'items.barcode-studio',
+                    'code' => '04',
+                    'label' => 'Studio Pembuat Barcode',
+                    'icon' => 'M6 9V4a1 1 0 011-1h10a1 1 0 011 1v5M6 18H5a2 2 0 01-2-2v-5a2 2 0 012-2h14a2 2 0 012 2v5a2 2 0 01-2 2h-1M17 12h.01M6 14h12v7a1 1 0 01-1 1H7a1 1 0 01-1-1v-7zm3 2v3m2-3v3m3-3v3m2-3v3',
+                    'color' => 'text-purple-400',
+                    'bg' => 'bg-purple-500/15 border-purple-400/30 text-purple-400 shadow-[0_0_12px_rgba(167,139,250,0.25)]',
+                ],
             ],
             'Dokumen & Pelaporan' => [
-                ['route' => 'handovers.index', 'active' => 'handovers.*', 'code' => '05', 'label' => 'Berita Acara (BAST & BAP)', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
-                ['route' => 'reports.index', 'active' => 'reports.*', 'code' => '06', 'label' => 'Laporan Keluar & Masuk', 'icon' => 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
+                [
+                    'route' => 'handovers.index',
+                    'active' => 'handovers.*',
+                    'code' => '05',
+                    'label' => 'Berita Acara (BAST & BAP)',
+                    'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9 2 2 4-4m-6 5h6',
+                    'color' => 'text-sky-400',
+                    'bg' => 'bg-sky-500/15 border-sky-400/30 text-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.25)]',
+                ],
+                [
+                    'route' => 'reports.index',
+                    'active' => 'reports.*',
+                    'code' => '06',
+                    'label' => 'Laporan Keluar & Masuk',
+                    'icon' => 'M3 3v18h18M7 16v-4m4 4v-7m4 7v-10m4 2l2-2m0 0l2 2m-2-2v7',
+                    'color' => 'text-teal-400',
+                    'bg' => 'bg-teal-500/15 border-teal-400/30 text-teal-400 shadow-[0_0_12px_rgba(45,212,191,0.25)]',
+                ],
             ],
             'Audit & Pengaturan' => [
-                ['route' => 'access-logs.index', 'active' => 'access-logs.*', 'code' => '07', 'label' => 'History Akses Web', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
-                ['route' => 'profile.edit', 'active' => 'profile.*', 'code' => '08', 'label' => 'Setingan Profil & User', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
+                [
+                    'route' => 'access-logs.index',
+                    'active' => 'access-logs.*',
+                    'code' => '07',
+                    'label' => 'History Akses Web',
+                    'icon' => 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM12 8v4l3 2',
+                    'color' => 'text-rose-400',
+                    'bg' => 'bg-rose-500/15 border-rose-400/30 text-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.25)]',
+                ],
+                [
+                    'route' => 'profile.edit',
+                    'active' => 'profile.*',
+                    'code' => '08',
+                    'label' => 'Setingan Profil & User',
+                    'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
+                    'color' => 'text-fuchsia-400',
+                    'bg' => 'bg-fuchsia-500/15 border-fuchsia-400/30 text-fuchsia-400 shadow-[0_0_12px_rgba(232,121,249,0.25)]',
+                ],
             ],
         ];
     @endphp
@@ -334,13 +399,15 @@
                     @foreach ($menus as $menu)
                         @php $isActive = request()->routeIs($menu['active']); @endphp
                         <a href="{{ route($menu['route']) }}"
-                           class="nav-link group relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ $isActive ? 'nav-active bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
-                            <div class="flex items-center gap-3">
-                                <span class="cyber-only font-mono-code text-[10px] {{ $isActive ? 'text-cyan-300' : 'text-slate-500' }}">[{{ $menu['code'] }}]</span>
-                                <svg class="w-5 h-5 shrink-0 {{ $isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400' }}" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menu['icon'] }}"/>
-                                </svg>
-                                <span>{{ $menu['label'] }}</span>
+                           class="nav-link group relative flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 {{ $isActive ? 'nav-active bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="cyber-only font-mono-code text-[10px] shrink-0 {{ $isActive ? 'text-cyan-200' : 'text-slate-500' }}">[{{ $menu['code'] }}]</span>
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-200 group-hover:scale-110 {{ $isActive ? 'bg-white/20 border-white/40 text-white shadow-[0_0_12px_rgba(255,255,255,0.4)]' : $menu['bg'] }}">
+                                    <svg class="w-4.5 h-4.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menu['icon'] }}"/>
+                                    </svg>
+                                </div>
+                                <span class="truncate">{{ $menu['label'] }}</span>
                             </div>
                             @if (!empty($menu['live']))
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full {{ $isActive ? 'bg-white/20 text-white' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' }}">
@@ -384,36 +451,44 @@
         <!-- MAIN CONTENT WRAPPER -->
         <div class="flex-1 lg:pl-[272px] flex flex-col min-h-screen pb-20 lg:pb-0">
             <!-- Top Header Bar -->
-            <header class="no-print sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 shadow-2xs">
-                <div class="flex items-center gap-3">
-                    <div class="lg:hidden w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 8h10M7 12h10M7 16h10"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-tight">
-                            <span class="cyber-only text-cyan-400 font-mono-code text-sm">&gt;_&nbsp;</span>@yield('page_title', 'Dashboard Logistik')
+            <header class="no-print sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2.5 sm:gap-4 shadow-2xs">
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <!-- Mobile Brand Icon & Logo TOC -->
+                    <a href="{{ route('dashboard') }}" class="lg:hidden flex items-center gap-2 shrink-0">
+                        <div class="w-9 h-9 rounded-full p-[2px] bg-gradient-to-b from-cyan-300 via-teal-400 to-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.45)]">
+                            <img src="{{ asset('images/logo-toc.jpg') }}" alt="Logo TOC" class="w-full h-full rounded-full object-cover">
+                        </div>
+                    </a>
+                    <div class="min-w-0">
+                        <h1 class="text-sm sm:text-base lg:text-lg font-extrabold text-slate-900 tracking-tight leading-tight truncate">
+                            <span class="cyber-only text-cyan-400 font-mono-code text-xs sm:text-sm">&gt;_&nbsp;</span>@yield('page_title', 'Dashboard Logistik')
                         </h1>
-                        <p class="hidden sm:block text-xs text-slate-500 font-medium">@yield('page_subtitle', 'Sistem Informasi Gudang Penyimpanan & Scan Barcode')</p>
+                        <p class="hidden sm:block text-xs text-slate-500 font-medium truncate">@yield('page_subtitle', 'Sistem Informasi Gudang Penyimpanan & Scan Barcode')</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                    <!-- Sesi HP (Mobile Session Countdown Pill) -->
+                    <div class="md:hidden flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50/90 border border-emerald-300 text-[10px] font-bold text-emerald-700 font-mono-code"
+                         title="Sisa sesi aktif (15 Menit)">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="session-countdown-mobile">15:00</span>
+                    </div>
+
                     <!-- HUD status (Mode Cyber) -->
                     <div class="cyber-only hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-emerald-400/30 bg-emerald-500/10 text-[11px] font-mono-code text-emerald-300">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         DB LINK: CONNECTED
                     </div>
 
-                    <!-- Indikator Sesi 15 Menit (Auto-Login / Auto-Redirect) -->
+                    <!-- Indikator Sesi 15 Menit (Desktop) -->
                     <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700"
                          title="Sesi aktif 15 menit (Otomatis reset saat beraktivitas & kembali ke login jika 15 menit tanpa aktivitas)">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span class="font-mono-code">SESI: <strong id="session-countdown-timer">15:00</strong></span>
                     </div>
 
-                    <!-- Jam WIB live -->
+                    <!-- Jam WIB live (Desktop) -->
                     <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 border border-slate-200/80 text-xs font-medium text-slate-700">
                         <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -423,7 +498,7 @@
 
                     <!-- Pengalih Tema -->
                     <button type="button" onclick="toggleAppTheme()" title="Ganti tema tampilan"
-                            class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-all">
+                            class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-all">
                         <span class="cyber-only inline-flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -438,12 +513,13 @@
                         </span>
                     </button>
 
-                    <a href="{{ route('scan.index') }}"
-                       class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-sm shadow-emerald-600/20 transition-all duration-200">
+                    <a href="{{ route('scan.index', ['camera' => 1]) }}"
+                       onclick="if ((window.location.pathname.endsWith('/scan') || window.location.pathname.indexOf('/scan') !== -1) && typeof startCameraScanner === 'function') { event.preventDefault(); startCameraScanner(true); return false; }"
+                       class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-sm shadow-emerald-600/20 transition-all duration-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                         </svg>
-                        <span class="hidden sm:inline">Scan Barcode</span>
+                        <span>Scan Barcode</span>
                     </a>
 
                     <a href="{{ route('profile.edit') }}"
@@ -458,7 +534,7 @@
                     </a>
 
                     <button type="button" onclick="toggleMobileDrawer()"
-                            class="lg:hidden inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">
+                            class="lg:hidden inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 shadow-2xs">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -532,22 +608,63 @@
             </footer>
         </div>
 
-        <!-- MOBILE BOTTOM NAVBAR -->
-        <nav class="no-print lg:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-slate-200 z-30 grid grid-cols-5 h-16 shadow-lg">
-            @foreach ([['dashboard', 'dashboard', 'Dashboard', $menuSections['Operasional Utama'][0]['icon']], ['scan.index', 'scan.*', 'Scan', $menuSections['Operasional Utama'][1]['icon']], ['items.index', 'items.*', 'Barang', $menuSections['Operasional Utama'][2]['icon']], ['handovers.index', 'handovers.*', 'BAST/BAP', $menuSections['Dokumen & Pelaporan'][0]['icon']]] as $bn)
-                <a href="{{ route($bn[0]) }}" class="flex flex-col items-center justify-center gap-1 text-[11px] font-semibold {{ request()->routeIs($bn[1]) ? 'text-emerald-600' : 'text-slate-500' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $bn[3] }}"/>
-                    </svg>
-                    <span>{{ $bn[2] }}</span>
+        <!-- MOBILE BOTTOM DOCK (Native App Style with Elevated Center Scan Action) -->
+        <nav class="no-print lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0B1120]/95 backdrop-blur-lg border-t border-cyan-500/20 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-2">
+            <div class="grid grid-cols-5 items-end max-w-md mx-auto">
+                <!-- 1. Dashboard -->
+                <a href="{{ route('dashboard') }}" class="group flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-bold transition-all {{ request()->routeIs('dashboard') ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200' }}">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-active:scale-95 {{ request()->routeIs('dashboard') ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 shadow-[0_0_10px_rgba(34,211,238,0.3)]' : 'bg-slate-900/60 text-slate-400' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menuSections['Operasional Utama'][0]['icon'] }}"/>
+                        </svg>
+                    </div>
+                    <span class="leading-none tracking-tight">Beranda</span>
                 </a>
-            @endforeach
-            <button type="button" onclick="toggleMobileDrawer()" class="flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-slate-600">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-                <span>Lainnya</span>
-            </button>
+
+                <!-- 2. Barang & Stok -->
+                <a href="{{ route('items.index') }}" class="group flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-bold transition-all {{ request()->routeIs('items.*') ? 'text-amber-400' : 'text-slate-400 hover:text-slate-200' }}">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-active:scale-95 {{ request()->routeIs('items.*') ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30 shadow-[0_0_10px_rgba(251,191,36,0.3)]' : 'bg-slate-900/60 text-slate-400' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menuSections['Operasional Utama'][2]['icon'] }}"/>
+                        </svg>
+                    </div>
+                    <span class="leading-none tracking-tight">Barang</span>
+                </a>
+
+                <!-- 3. CENTER ELEVATED SCAN BUTTON (FAB) -->
+                <div class="flex flex-col items-center justify-center -mt-5">
+                    <a href="{{ route('scan.index', ['camera' => 1]) }}"
+                       onclick="if ((window.location.pathname.endsWith('/scan') || window.location.pathname.indexOf('/scan') !== -1) && typeof startCameraScanner === 'function') { event.preventDefault(); startCameraScanner(true); return false; }"
+                       title="Buka Terminal Scan Barcode & Langsung Nyalakan Kamera"
+                       class="group relative flex items-center justify-center w-13 h-13 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.55)] border-2 border-emerald-300/80 transition-transform active:scale-90 hover:scale-105">
+                        <div class="absolute inset-0 rounded-full bg-emerald-400/30 animate-ping pointer-events-none"></div>
+                        <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menuSections['Operasional Utama'][1]['icon'] }}"/>
+                        </svg>
+                    </a>
+                    <span class="text-[9px] font-extrabold uppercase font-mono-code text-emerald-400 mt-1 leading-none">SCAN</span>
+                </div>
+
+                <!-- 4. Berita Acara BAST/BAP -->
+                <a href="{{ route('handovers.index') }}" class="group flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-bold transition-all {{ request()->routeIs('handovers.*') ? 'text-sky-400' : 'text-slate-400 hover:text-slate-200' }}">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-active:scale-95 {{ request()->routeIs('handovers.*') ? 'bg-sky-500/20 text-sky-400 border border-sky-400/30 shadow-[0_0_10px_rgba(56,189,248,0.3)]' : 'bg-slate-900/60 text-slate-400' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menuSections['Dokumen & Pelaporan'][0]['icon'] }}"/>
+                        </svg>
+                    </div>
+                    <span class="leading-none tracking-tight">BAST/BAP</span>
+                </a>
+
+                <!-- 5. Drawer Lainnya -->
+                <button type="button" onclick="toggleMobileDrawer()" class="group flex flex-col items-center justify-center gap-1 py-1 text-[10px] font-bold text-slate-400 hover:text-white transition-all">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-900/60 text-slate-400 group-hover:text-white transition-transform group-active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </div>
+                    <span class="leading-none tracking-tight">Lainnya</span>
+                </button>
+            </div>
         </nav>
 
         <!-- MOBILE OVERFLOW DRAWER -->
@@ -563,14 +680,33 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="mt-4 space-y-1.5">
-                        @foreach ($menuSections as $menus)
-                            @foreach ($menus as $menu)
-                                <a href="{{ route($menu['route']) }}"
-                                   class="nav-link block px-3.5 py-2.5 rounded-xl text-sm font-semibold {{ request()->routeIs($menu['active']) ? 'nav-active bg-emerald-600' : 'hover:bg-slate-800' }}">
-                                    <span class="cyber-only font-mono-code text-[10px] text-cyan-400">[{{ $menu['code'] }}]&nbsp;</span>{{ $menu['label'] }}
-                                </a>
-                            @endforeach
+                    <div class="mt-4 space-y-3 overflow-y-auto max-h-[calc(100vh-210px)] pr-1">
+                        @foreach ($menuSections as $sectionLabel => $menus)
+                            <div>
+                                <div class="px-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                    <span class="cyber-only text-cyan-500/70 font-mono-code">//&nbsp;</span>{{ $sectionLabel }}
+                                </div>
+                                <div class="space-y-1">
+                                    @foreach ($menus as $menu)
+                                        @php $isActive = request()->routeIs($menu['active']); @endphp
+                                        <a href="{{ route($menu['route']) }}"
+                                           class="nav-link flex items-center justify-between px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 {{ $isActive ? 'nav-active bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800/80 hover:text-white' }}">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <span class="cyber-only font-mono-code text-[10px] shrink-0 {{ $isActive ? 'text-cyan-200' : 'text-slate-500' }}">[{{ $menu['code'] }}]</span>
+                                                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border {{ $isActive ? 'bg-white/20 border-white/40 text-white' : $menu['bg'] }}">
+                                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menu['icon'] }}"/>
+                                                    </svg>
+                                                </div>
+                                                <span class="truncate">{{ $menu['label'] }}</span>
+                                            </div>
+                                            @if (!empty($menu['live']))
+                                                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded-full {{ $isActive ? 'bg-white/20 text-white' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' }}">LIVE</span>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -677,10 +813,15 @@
             setInterval(function () {
                 remaining--;
                 if (remaining < 0) remaining = 0;
+                var mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+                var ss = String(remaining % 60).padStart(2, '0');
+                var timeText = mm + ':' + ss;
                 if (timerEl) {
-                    var mm = String(Math.floor(remaining / 60)).padStart(2, '0');
-                    var ss = String(remaining % 60).padStart(2, '0');
-                    timerEl.textContent = mm + ':' + ss;
+                    timerEl.textContent = timeText;
+                }
+                var mobileTimerEl = document.getElementById('session-countdown-mobile');
+                if (mobileTimerEl) {
+                    mobileTimerEl.textContent = timeText;
                 }
                 if (remaining === 0) {
                     var logoutForm = document.getElementById('auto-logout-form');

@@ -211,12 +211,13 @@
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
                         <div class="sm:col-span-5">
                             <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Jumlah (Qty) *</label>
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 w-full">
+                                <button type="button" onclick="adjustScanQty(-1)" class="w-10 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-extrabold text-slate-700 flex items-center justify-center shrink-0 active:scale-95 border border-slate-200" title="Kurang 1">-1</button>
                                 <input type="number" id="scan_qty" name="quantity" value="1" min="1" required
-                                       class="w-24 px-3 py-2.5 rounded-xl border border-slate-300 text-base font-extrabold text-slate-900 text-center">
-                                <button type="button" onclick="adjustScanQty(1)" class="px-2.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-extrabold text-slate-700">+1</button>
-                                <button type="button" onclick="adjustScanQty(5)" class="px-2.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-extrabold text-slate-700">+5</button>
-                                <button type="button" onclick="adjustScanQty(10)" class="px-2.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-extrabold text-slate-700">+10</button>
+                                       class="flex-1 min-w-[65px] h-11 px-2.5 rounded-xl border border-slate-300 text-base font-extrabold text-slate-900 text-center">
+                                <button type="button" onclick="adjustScanQty(1)" class="flex-1 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-extrabold text-slate-700 active:scale-95 border border-slate-200">+1</button>
+                                <button type="button" onclick="adjustScanQty(5)" class="flex-1 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-extrabold text-slate-700 active:scale-95 border border-slate-200">+5</button>
+                                <button type="button" onclick="adjustScanQty(10)" class="flex-1 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-extrabold text-slate-700 active:scale-95 border border-slate-200">+10</button>
                             </div>
                         </div>
 
@@ -260,7 +261,7 @@
                     <h3 class="text-sm font-extrabold text-slate-900">Hasil Scan Tersimpan di Database Penyimpanan</h3>
                     <a href="{{ route('reports.index') }}" class="text-xs font-bold text-emerald-600 hover:underline">Buka Laporan &rarr;</a>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse table-fluid">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-500">
@@ -314,6 +315,43 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <!-- TAMPILAN HASIL SCAN KHUSUS HP (MD HIDDEN) -->
+                <div class="md:hidden divide-y divide-slate-100 p-3 space-y-2.5">
+                    @foreach ($recentScans as $scan)
+                        <div class="card-elevated bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-mono-code font-bold text-[11px] text-slate-800">{{ $scan->reference_no }}</span>
+                                @if ($scan->movement_type === 'in')
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
+                                        MASUK +{{ $scan->quantity }} {{ $scan->item?->unit }}
+                                    </span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">
+                                        KELUAR -{{ $scan->quantity }} {{ $scan->item?->unit }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-start gap-2.5">
+                                @if ($scan->item?->photo_url)
+                                    <button type="button" onclick="openPhotoLightbox('{{ $scan->item->photo_url }}', '{{ addslashes($scan->item->name) }}')"
+                                            class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                                        <img src="{{ $scan->item->photo_url }}" alt="{{ $scan->item->name }}" class="w-full h-full object-cover">
+                                    </button>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-bold text-slate-900 text-xs truncate">{{ $scan->item?->name }}</div>
+                                    <div class="text-[11px] text-emerald-700 font-mono-code">Barcode: {{ $scan->item?->barcode }}</div>
+                                    <div class="text-[10px] text-slate-500 mt-1 flex items-center justify-between">
+                                        <span>Stok: {{ $scan->stock_before }} &rarr; <strong class="text-slate-800">{{ $scan->stock_after }}</strong></span>
+                                        <span>Petugas: <strong class="text-slate-700">{{ $scan->user?->name ?? 'Sistem' }}</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -434,7 +472,69 @@
         .catch(function () {});
     }
 
-    function toggleCameraScanner() {
+    function startCameraScanner(autoScroll) {
+        var container = document.getElementById('camera-container');
+        var placeholder = document.getElementById('camera-placeholder');
+        var btn = document.getElementById('btn-toggle-camera');
+
+        if (cameraRunning && html5QrCodeScanner) {
+            if (autoScroll && container) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+
+        // Jika modul Html5Qrcode belum selesai dimuat, tunggu polling aman
+        if (typeof Html5Qrcode === 'undefined') {
+            var retries = 0;
+            var timer = setInterval(function () {
+                retries++;
+                if (typeof Html5Qrcode !== 'undefined') {
+                    clearInterval(timer);
+                    startCameraScanner(autoScroll);
+                } else if (retries > 25) {
+                    clearInterval(timer);
+                    console.warn('Pustaka Html5Qrcode belum siap.');
+                }
+            }, 120);
+            return;
+        }
+
+        if (container) container.classList.remove('hidden');
+        if (placeholder) placeholder.classList.add('hidden');
+        if (btn) btn.textContent = 'Tutup Kamera';
+
+        if (autoScroll && container) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        try {
+            if (!html5QrCodeScanner) {
+                html5QrCodeScanner = new Html5Qrcode('reader');
+            }
+            html5QrCodeScanner.start(
+                { facingMode: 'environment' },
+                { fps: 10, qrbox: { width: 260, height: 130 } },
+                function (decodedText) {
+                    triggerBarcodeLookup(decodedText, 'camera');
+                },
+                function () {}
+            ).then(function () {
+                cameraRunning = true;
+            }).catch(function (err) {
+                cameraRunning = false;
+                if (container) container.classList.add('hidden');
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (btn) btn.textContent = 'Buka Kamera';
+                console.warn('Kamera tidak dapat diakses:', err);
+            });
+        } catch (e) {
+            cameraRunning = false;
+            console.error('Inisialisasi scanner gagal:', e);
+        }
+    }
+
+    function stopCameraScanner() {
         var container = document.getElementById('camera-container');
         var placeholder = document.getElementById('camera-placeholder');
         var btn = document.getElementById('btn-toggle-camera');
@@ -442,40 +542,27 @@
         if (cameraRunning && html5QrCodeScanner) {
             html5QrCodeScanner.stop().then(function () {
                 cameraRunning = false;
-                container.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-                btn.textContent = 'Buka Kamera';
-            }).catch(function () {});
-            return;
+                if (container) container.classList.add('hidden');
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (btn) btn.textContent = 'Buka Kamera';
+            }).catch(function (err) {
+                console.warn('Stop kamera:', err);
+            });
         }
-
-        if (typeof Html5Qrcode === 'undefined') {
-            alert('Modul kamera sedang dimuat, silakan coba sesaat lagi.');
-            return;
-        }
-
-        container.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-        btn.textContent = 'Tutup Kamera';
-
-        html5QrCodeScanner = new Html5Qrcode('reader');
-        html5QrCodeScanner.start(
-            { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 250, height: 120 } },
-            function (decodedText) {
-                triggerBarcodeLookup(decodedText, 'camera');
-            },
-            function () {}
-        ).then(function () {
-            cameraRunning = true;
-        }).catch(function (err) {
-            cameraRunning = false;
-            container.classList.add('hidden');
-            placeholder.classList.remove('hidden');
-            btn.textContent = 'Buka Kamera';
-            alert('Kamera tidak dapat diakses pada perangkat ini (' + err + '). Anda tetap dapat menggunakan alat scanner USB atau memilih barang di daftar.');
-        });
     }
+
+    function toggleCameraScanner() {
+        if (cameraRunning) {
+            stopCameraScanner();
+        } else {
+            startCameraScanner(true);
+        }
+    }
+
+    // Expose ke window untuk akses tombol navigasi
+    window.startCameraScanner = startCameraScanner;
+    window.stopCameraScanner = stopCameraScanner;
+    window.toggleCameraScanner = toggleCameraScanner;
 
     document.addEventListener('DOMContentLoaded', function () {
         setScanMode('{{ $initialMode }}');
@@ -490,6 +577,14 @@
 
         if (barcodeInput.value.trim() !== '') {
             triggerBarcodeLookup(barcodeInput.value.trim(), 'manual');
+        }
+
+        // Auto-start kamera jika diakses via parameter ?camera=1 atau ?autostart=1
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('camera') === '1' || urlParams.get('autostart') === '1') {
+            setTimeout(function () {
+                startCameraScanner(true);
+            }, 250);
         }
     });
 </script>
