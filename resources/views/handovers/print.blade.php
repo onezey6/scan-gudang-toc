@@ -144,10 +144,10 @@
             </tbody>
         </table>
 
-        <!-- PASAL KETENTUAN & KEWAJIBAN PINJAM PAKAI -->
+        <!-- PASAL KETENTUAN KEDINASAN PINJAM PAKAI / PENGEMBALIAN -->
         @if ($handover->terms_conditions)
             <div class="mb-4 p-3 rounded border border-slate-400 bg-slate-50/70 text-[11px] leading-relaxed">
-                <div class="font-bold uppercase underline mb-1">KETENTUAN & KEWAJIBAN PINJAM PAKAI BARANG INVENTARIS:</div>
+                <div class="font-bold uppercase underline mb-1">{{ $handover->document_type === 'bap' ? 'KETENTUAN & SYARAT PENGEMBALIAN BARANG INVENTARIS (BAP):' : 'KETENTUAN & KEWAJIBAN PINJAM PAKAI BARANG INVENTARIS (BAST):' }}</div>
                 <div class="whitespace-pre-line">{{ $handover->terms_conditions }}</div>
             </div>
         @endif
@@ -203,7 +203,7 @@
         @if ($handover->photos->count() > 0)
             <div class="mt-8 pt-6 border-t-2 border-dashed border-slate-300 break-inside-avoid">
                 <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-800 mb-3">
-                    LAMPIRAN DOKUMENTASI FOTO BUKTI ({{ $handover->photos->count() }} FOTO) — {{ $handover->document_no }}
+                    LAMPIRAN DOKUMENTASI FOTO BUKTI {{ $handover->document_type === 'bap' ? 'PENGEMBALIAN' : 'PINJAM PAKAI' }} ({{ $handover->photos->count() }} FOTO) — {{ $handover->document_no }}
                 </h3>
                 <div class="grid grid-cols-3 gap-3">
                     @foreach ($handover->photos as $photo)

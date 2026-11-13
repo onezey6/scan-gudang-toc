@@ -76,7 +76,7 @@ class HandoverController extends Controller
             $selectedBast = HandoverDocument::with('items.item')->find($request->input('bast_id'));
         }
 
-        $defaultTerms = HandoverDocument::defaultTermsAndConditions();
+        $defaultTerms = HandoverDocument::defaultTermsAndConditions($docType);
 
         return view('handovers.create', compact(
             'docType',
@@ -173,7 +173,7 @@ class HandoverController extends Controller
                 'first_party_signature' => $validated['first_party_signature'] ?? null,
                 'second_party_signature' => $validated['second_party_signature'] ?? null,
                 'notes' => $validated['notes'] ?? null,
-                'terms_conditions' => $validated['terms_conditions'] ?? HandoverDocument::defaultTermsAndConditions(),
+                'terms_conditions' => $validated['terms_conditions'] ?? HandoverDocument::defaultTermsAndConditions($docType),
                 'approver_name' => $validated['approver_name'] ?? null,
                 'approver_nip' => $validated['approver_nip'] ?? null,
                 'approver_title' => $validated['approver_title'] ?? null,
@@ -328,8 +328,22 @@ class HandoverController extends Controller
 
     private function saveEvidencePhotos(Request $request, HandoverDocument $handover, ?int $userId): int
     {
-        $files = $request->file('photos') ?? $request->file('evidence_photos') ?? [];
-        if (empty($files)) {
+        $rawFiles = [];
+        if ($request->hasFile('photos')) {
+            $rawFiles[] = $request->file('photos');
+        }
+        if ($request->hasFile('evidence_photos')) {
+            $rawFiles[] = $request->file('evidence_photos');
+        }
+
+        $allFiles = [];
+        array_walk_recursive($rawFiles, function ($file) use (&$allFiles) {
+            if ($file instanceof \Illuminate\Http\UploadedFile && $file->isValid()) {
+                $allFiles[] = $file;
+            }
+        });
+
+        if (empty($allFiles)) {
             return 0;
         }
 
@@ -338,14 +352,16 @@ class HandoverController extends Controller
             File::makeDirectory($uploadDir, 0755, true);
         }
 
-        $captions = $request->input('photo_captions') ?? $request->input('evidence_captions') ?? [];
+        $captions = array_values(array_filter(
+            array_merge(
+                (array) $request->input('photo_captions', []),
+                (array) $request->input('evidence_captions', [])
+            ),
+            function ($c) { return $c !== null && $c !== ''; }
+        ));
+
         $saved = 0;
-
-        foreach ($files as $idx => $file) {
-            if (!$file || !$file->isValid()) {
-                continue;
-            }
-
+        foreach ($allFiles as $idx => $file) {
             $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
             $filename = 'bukti_' . strtolower($handover->document_type) . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
             $file->move($uploadDir, $filename);
@@ -353,7 +369,7 @@ class HandoverController extends Controller
             HandoverPhoto::create([
                 'handover_document_id' => $handover->id,
                 'photo_path' => 'uploads/handovers/' . $filename,
-                'caption' => $captions[$idx] ?? null,
+                'caption' => $captions[$idx] ?? ('Dokumentasi Bukti #' . ($saved + 1)),
                 'uploaded_by' => $userId,
             ]);
             $saved++;
