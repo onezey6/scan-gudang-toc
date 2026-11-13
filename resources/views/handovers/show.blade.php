@@ -187,7 +187,7 @@
                             </div>
                             <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-slate-200/80">
                                 <span>{{ $photo->created_at?->format('d/m/Y H:i') }}</span>
-                                <form action="{{ route('handovers.photos.destroy', $photo) }}" method="POST"
+                                <form action="{{ route('handovers.photos.destroy', [$handover, $photo]) }}" method="POST"
                                       onsubmit="return confirm('Hapus foto bukti ini?')">
                                     @csrf
                                     @method('DELETE')

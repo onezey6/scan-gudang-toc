@@ -173,6 +173,7 @@ class LogisticsFlowTest extends TestCase
         ]);
         $resAddPhotos->assertRedirect();
         $this->assertEquals(3, $bastDoc->photos()->count());
+        $this->get(route('handovers.show', $bastDoc))->assertStatus(200);
 
         // 2. Buat BAP (Pengembalian 2 unit dari BAST tersebut)
         $resBap = $this->post('/handovers', [
