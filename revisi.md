@@ -1,2 +1,2 @@
 # DRAF REVISI & TAMBAHAN FITUR (WORKSPACE SEMENTARA)
-> **Status Saat Ini:** Kosong (Aktivasi Live Kamera via HTTPS telah selesai diterapkan dan disinkronkan).
+> **Status Saat Ini:** Kosong (Perbaikan tombol Buka Kamera HP langsung aktif tanpa kabel telah selesai diterapkan).

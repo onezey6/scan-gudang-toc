@@ -45,27 +45,37 @@
         <!-- Left 5 Cols: Laser Viewfinder Scanner + Quick Catalog Picker -->
         <div class="lg:col-span-5 space-y-6">
             <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-                <div class="p-4 bg-[#0B1120] text-white flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <div>
-                            <h3 class="text-sm font-extrabold">Pemindai Kamera & Laser Scanner</h3>
-                            <p class="text-[11px] text-slate-400">Kamera HP/Webcam atau Alat Scanner USB/Bluetooth</p>
+                <div class="p-4 bg-[#0B1120] text-white flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                        <div class="min-w-0">
+                            <h3 class="text-sm font-extrabold truncate">Pemindai Kamera Barcode</h3>
+                            <p class="text-[11px] text-slate-400 truncate">Kamera Langsung HP / Webcam</p>
                         </div>
                     </div>
-                    <button type="button" id="btn-toggle-camera" onclick="toggleCameraScanner()"
-                            class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all">
-                        Buka Kamera
-                    </button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button type="button" id="btn-toggle-camera" onclick="toggleCameraScanner()"
+                                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-extrabold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span id="btn-toggle-camera-label">Buka Kamera</span>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Input Kamera Belakang HP Langsung (Zero-Config untuk HTTP & Mobile) -->
+                <input type="file" id="native-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleNativeCameraCapture(this)">
 
                 <div class="p-4 space-y-4">
                     <div id="camera-container" class="hidden rounded-2xl overflow-hidden border-2 border-emerald-500 bg-slate-950">
                         <div id="reader" class="w-full"></div>
                     </div>
 
-                    <!-- Interactive Viewfinder with Animated Laser Line -->
-                    <div id="camera-placeholder" class="relative p-6 rounded-2xl bg-[#0F172A] text-white border border-slate-800 text-center overflow-hidden">
+                    <!-- Interactive Viewfinder (Seluruh Kotak Bisa Disentuh untuk Buka Kamera HP) -->
+                    <div id="camera-placeholder" onclick="toggleCameraScanner()" role="button" tabindex="0"
+                         class="relative p-6 rounded-2xl bg-[#0F172A] hover:bg-slate-900 active:scale-[0.99] text-white border-2 border-emerald-500/40 hover:border-emerald-400 text-center overflow-hidden cursor-pointer transition-all select-none">
                         <!-- Viewfinder Corners -->
                         <div class="pointer-events-none absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-emerald-400 rounded-tl"></div>
                         <div class="pointer-events-none absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-emerald-400 rounded-tr"></div>
@@ -74,17 +84,37 @@
                         <!-- Animated Green Laser -->
                         <div class="laser-line"></div>
 
-                        <div class="relative z-10 py-2">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                        <div id="camera-placeholder-content" class="relative z-10 py-2">
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                             </div>
-                            <div class="mt-2.5 text-xs font-extrabold uppercase tracking-wider text-emerald-400">Sensor Alat Scanner USB Aktif</div>
-                            <p class="text-[11px] text-slate-300 mt-1 max-w-xs mx-auto leading-relaxed">
-                                Tembakkan alat scanner fisik langsung, klik <strong>"Buka Kamera"</strong> di atas, atau klik salah satu barang di bawah untuk simulasi scan instan.
+                            <div id="camera-placeholder-title" class="mt-3 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-emerald-400">
+                                Kamera Pemindai Barcode HP Siap
+                            </div>
+                            <p id="camera-placeholder-desc" class="text-[11px] text-slate-300 mt-1 max-w-xs mx-auto leading-relaxed">
+                                Sentuh kotak ini atau tekan tombol <strong>"Buka Kamera"</strong> untuk membuka kamera belakang HP Anda secara langsung (tanpa kabel).
                             </p>
+                            <div class="mt-3.5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-md">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                </svg>
+                                <span>Sentuh untuk Buka Kamera Sekarang</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Banner Opsi Live Video Stream Terus-Menerus (Muncul Otomatis Jika Dibuka via HTTP Biasa di HP) -->
+                    <div id="https-live-banner" class="hidden p-3 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
+                        <div class="text-slate-300 text-[11px] leading-snug">
+                            <strong class="text-cyan-400">Tips Kamera HP:</strong> Tombol <strong>Buka Kamera</strong> di atas langsung membuka kamera bawaan HP. Jika ingin video live menyala terus di dalam kotak, buka jalur HTTPS:
+                        </div>
+                        <a id="https-live-link" href="https://{{ request()->getHost() }}/web%20scan%20logistik/public/scan?camera=1"
+                           class="shrink-0 w-full sm:w-auto text-center px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-300 font-extrabold text-[11px] transition-all">
+                            Mode Video Live (HTTPS) &rarr;
+                        </a>
                     </div>
 
                     <!-- Daftar Simulasi / Klik Cepat Barcode Barang Gudang -->
@@ -566,14 +596,206 @@
         .catch(function () {});
     }
 
-    function startCameraScanner(autoScroll) {
+    function setCameraButtonLabel(text) {
+        var lbl = document.getElementById('btn-toggle-camera-label');
+        if (lbl) {
+            lbl.textContent = text;
+        } else {
+            var btn = document.getElementById('btn-toggle-camera');
+            if (btn) btn.textContent = text;
+        }
+    }
+
+    function canUseLiveVideoStream() {
+        return !!(window.isSecureContext && navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function');
+    }
+
+    function triggerNativeCameraCapture() {
+        var fileInput = document.getElementById('native-camera-input');
+        if (fileInput) {
+            fileInput.value = '';
+            fileInput.click();
+        }
+    }
+
+    function openCameraHttpModal(errMsg) {
+        var modal = document.getElementById('modal-camera-http-guide');
+        var detail = document.getElementById('camera-error-detail');
+        if (detail && errMsg) {
+            detail.textContent = '(' + errMsg + ')';
+        }
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCameraHttpModal() {
+        var modal = document.getElementById('modal-camera-http-guide');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function triggerNativeCameraFromModal() {
+        closeCameraHttpModal();
+        triggerNativeCameraCapture();
+    }
+
+    function copyLanOrigin() {
+        var originText = window.location.origin;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(originText);
+        }
+    }
+
+    function createResizedBarcodeFile(file, maxDim, boostContrast) {
+        return new Promise(function (resolve) {
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function () {
+                URL.revokeObjectURL(url);
+                var w = img.width;
+                var h = img.height;
+                if (w > maxDim || h > maxDim) {
+                    if (w > h) {
+                        h = Math.round((h * maxDim) / w);
+                        w = maxDim;
+                    } else {
+                        w = Math.round((w * maxDim) / h);
+                        h = maxDim;
+                    }
+                }
+                var canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                if (boostContrast) {
+                    ctx.filter = 'contrast(1.45) grayscale(1)';
+                }
+                ctx.drawImage(img, 0, 0, w, h);
+                canvas.toBlob(function (blob) {
+                    if (blob) {
+                        resolve(new File([blob], 'scan-resized.jpg', { type: 'image/jpeg' }));
+                    } else {
+                        resolve(file);
+                    }
+                }, 'image/jpeg', 0.92);
+            };
+            img.onerror = function () {
+                URL.revokeObjectURL(url);
+                resolve(file);
+            };
+            img.src = url;
+        });
+    }
+
+    async function decodeBarcodeFromFile(file) {
+        // 1. Gunakan BarcodeDetector bawaan Chrome Android jika tersedia (sangat cepat & akurat untuk 1D/2D)
+        if ('BarcodeDetector' in window) {
+            try {
+                var detector = new window.BarcodeDetector({
+                    formats: ['code_128', 'ean_13', 'ean_8', 'code_39', 'code_93', 'qr_code', 'upc_a', 'upc_e', 'itf', 'codabar']
+                });
+                var bitmap = await createImageBitmap(file);
+                var barcodes = await detector.detect(bitmap);
+                if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+                    return barcodes[0].rawValue;
+                }
+            } catch (e) {}
+        }
+
+        // 2. Gunakan Html5Qrcode.scanFile pada gambar teroptimasi & asli
+        if (typeof Html5Qrcode !== 'undefined') {
+            var tempId = 'reader-file-temp';
+            var tempEl = document.getElementById(tempId);
+            if (!tempEl) {
+                tempEl = document.createElement('div');
+                tempEl.id = tempId;
+                tempEl.className = 'hidden';
+                document.body.appendChild(tempEl);
+            }
+            var fileScanner = new Html5Qrcode(tempId);
+            var candidates = [
+                await createResizedBarcodeFile(file, 1400, false),
+                await createResizedBarcodeFile(file, 1100, true),
+                file
+            ];
+            for (var i = 0; i < candidates.length; i++) {
+                try {
+                    var decoded = await fileScanner.scanFile(candidates[i], false);
+                    if (decoded) {
+                        return decoded;
+                    }
+                } catch (err) {}
+            }
+        }
+        return null;
+    }
+
+    async function handleNativeCameraCapture(input) {
+        if (!input || !input.files || !input.files[0]) return;
+        var file = input.files[0];
+        var contentBox = document.getElementById('camera-placeholder-content');
+        var previewUrl = URL.createObjectURL(file);
+
+        if (contentBox) {
+            contentBox.innerHTML =
+                '<div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-emerald-400 mx-auto shadow-lg mb-2.5">' +
+                    '<img src="' + previewUrl + '" class="w-full h-full object-cover" alt="Capture">' +
+                '</div>' +
+                '<div class="text-xs font-extrabold uppercase tracking-wider text-amber-400 animate-pulse">Memindai Barcode dari Kamera HP...</div>' +
+                '<p class="text-[11px] text-slate-300 mt-1">Mohon tunggu sejenak, sistem sedang membaca garis barcode.</p>';
+        }
+
+        var decodedText = await decodeBarcodeFromFile(file);
+        if (decodedText) {
+            triggerBarcodeLookup(decodedText, 'camera');
+            if (contentBox) {
+                contentBox.innerHTML =
+                    '<div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400 text-emerald-400 flex items-center justify-center mx-auto">' +
+                        '<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>' +
+                    '</div>' +
+                    '<div class="mt-2 text-xs font-extrabold uppercase tracking-wider text-emerald-400">Barcode Berhasil Terbaca dari Kamera HP</div>' +
+                    '<div class="mt-1 font-mono-code text-sm font-extrabold text-white bg-slate-900/90 px-3 py-1 rounded-lg inline-block border border-emerald-500/40">' + decodedText + '</div>' +
+                    '<div class="mt-3"><span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-extrabold">Sentuh untuk Scan Barang Berikutnya</span></div>';
+            }
+            var formCard = document.getElementById('form-scan-process');
+            if (formCard) {
+                setTimeout(function () {
+                    formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 250);
+            }
+        } else {
+            if (contentBox) {
+                contentBox.innerHTML =
+                    '<div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-400 text-rose-400 flex items-center justify-center mx-auto">' +
+                        '<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' +
+                    '</div>' +
+                    '<div class="mt-2 text-xs font-extrabold uppercase tracking-wider text-rose-400">Barcode Belum Terlihat Jelas</div>' +
+                    '<p class="text-[11px] text-slate-300 mt-1 max-w-xs mx-auto">Pastikan gambar barcode fokus dan terang, lalu sentuh kotak ini untuk membuka kamera lagi.</p>' +
+                    '<div class="mt-3"><span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold">Buka Kamera HP Lagi</span></div>';
+            }
+        }
+    }
+
+    function startCameraScanner(autoScroll, fromAutoParam) {
         var container = document.getElementById('camera-container');
         var placeholder = document.getElementById('camera-placeholder');
-        var btn = document.getElementById('btn-toggle-camera');
 
         if (cameraRunning && html5QrCodeScanner) {
             if (autoScroll && container) {
                 container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+
+        // Jika dibuka di HP melalui koneksi HTTP biasa (bukan HTTPS/localhost),
+        // browser HP memblokir navigator.mediaDevices. Langsung buka Kamera Bawaan HP secara instan!
+        if (!canUseLiveVideoStream()) {
+            var httpsBanner = document.getElementById('https-live-banner');
+            if (httpsBanner) httpsBanner.classList.remove('hidden');
+
+            if (autoScroll && placeholder) {
+                placeholder.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (!fromAutoParam) {
+                triggerNativeCameraCapture();
             }
             return;
         }
@@ -585,10 +807,10 @@
                 retries++;
                 if (typeof Html5Qrcode !== 'undefined') {
                     clearInterval(timer);
-                    startCameraScanner(autoScroll);
+                    startCameraScanner(autoScroll, fromAutoParam);
                 } else if (retries > 25) {
                     clearInterval(timer);
-                    console.warn('Pustaka Html5Qrcode belum siap.');
+                    if (!fromAutoParam) triggerNativeCameraCapture();
                 }
             }, 120);
             return;
@@ -596,7 +818,7 @@
 
         if (container) container.classList.remove('hidden');
         if (placeholder) placeholder.classList.add('hidden');
-        if (btn) btn.textContent = 'Tutup Kamera';
+        setCameraButtonLabel('Tutup Kamera');
 
         if (autoScroll && container) {
             container.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -615,30 +837,56 @@
                 function () {}
             ).then(function () {
                 cameraRunning = true;
-            }).catch(function (err) {
-                cameraRunning = false;
-                if (container) container.classList.add('hidden');
-                if (placeholder) placeholder.classList.remove('hidden');
-                if (btn) btn.textContent = 'Buka Kamera';
-                console.warn('Kamera tidak dapat diakses:', err);
+            }).catch(function () {
+                // Fallback ke daftar kamera jika facingMode environment ditolak (misal di webcam laptop)
+                Html5Qrcode.getCameras().then(function (cameras) {
+                    if (cameras && cameras.length > 0) {
+                        var camId = cameras[cameras.length - 1].id;
+                        return html5QrCodeScanner.start(
+                            camId,
+                            { fps: 10, qrbox: { width: 260, height: 130 } },
+                            function (decodedText) {
+                                triggerBarcodeLookup(decodedText, 'camera');
+                            },
+                            function () {}
+                        ).then(function () {
+                            cameraRunning = true;
+                        });
+                    } else {
+                        throw new Error('Tidak ada kamera terdeteksi');
+                    }
+                }).catch(function (err2) {
+                    cameraRunning = false;
+                    if (container) container.classList.add('hidden');
+                    if (placeholder) placeholder.classList.remove('hidden');
+                    setCameraButtonLabel('Buka Kamera');
+                    if (!fromAutoParam) {
+                        triggerNativeCameraCapture();
+                    }
+                    console.warn('Kamera live stream dialihkan ke kamera perangkat:', err2);
+                });
             });
         } catch (e) {
             cameraRunning = false;
-            console.error('Inisialisasi scanner gagal:', e);
+            if (container) container.classList.add('hidden');
+            if (placeholder) placeholder.classList.remove('hidden');
+            setCameraButtonLabel('Buka Kamera');
+            if (!fromAutoParam) {
+                triggerNativeCameraCapture();
+            }
         }
     }
 
     function stopCameraScanner() {
         var container = document.getElementById('camera-container');
         var placeholder = document.getElementById('camera-placeholder');
-        var btn = document.getElementById('btn-toggle-camera');
 
         if (cameraRunning && html5QrCodeScanner) {
             html5QrCodeScanner.stop().then(function () {
                 cameraRunning = false;
                 if (container) container.classList.add('hidden');
                 if (placeholder) placeholder.classList.remove('hidden');
-                if (btn) btn.textContent = 'Buka Kamera';
+                setCameraButtonLabel('Buka Kamera');
             }).catch(function (err) {
                 console.warn('Stop kamera:', err);
             });
@@ -649,7 +897,7 @@
         if (cameraRunning) {
             stopCameraScanner();
         } else {
-            startCameraScanner(true);
+            startCameraScanner(true, false);
         }
     }
 
@@ -657,9 +905,16 @@
     window.startCameraScanner = startCameraScanner;
     window.stopCameraScanner = stopCameraScanner;
     window.toggleCameraScanner = toggleCameraScanner;
+    window.triggerNativeCameraCapture = triggerNativeCameraCapture;
 
     document.addEventListener('DOMContentLoaded', function () {
         setScanMode('{{ $initialMode }}');
+
+        // Tampilkan banner opsi HTTPS Live Video jika dibuka dari koneksi HTTP non-localhost
+        if (!canUseLiveVideoStream()) {
+            var httpsBanner = document.getElementById('https-live-banner');
+            if (httpsBanner) httpsBanner.classList.remove('hidden');
+        }
 
         var barcodeInput = document.getElementById('barcode_input');
         barcodeInput.addEventListener('keydown', function (e) {
@@ -673,11 +928,11 @@
             triggerBarcodeLookup(barcodeInput.value.trim(), 'manual');
         }
 
-        // Auto-start kamera jika diakses via parameter ?camera=1 atau ?autostart=1
+        // Auto-start kamera jika diakses via parameter ?camera=1 atau ?autostart=1 atau ?autostart=camera
         var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('camera') === '1' || urlParams.get('autostart') === '1') {
+        if (urlParams.get('camera') === '1' || urlParams.get('autostart') === '1' || urlParams.get('autostart') === 'camera') {
             setTimeout(function () {
-                startCameraScanner(true);
+                startCameraScanner(true, true);
             }, 250);
         }
     });
