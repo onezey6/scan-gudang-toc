@@ -89,7 +89,7 @@ composer install --no-dev --optimize-autoloader --no-interaction
 # 9. Restore Database Lengkap
 if [ -f "$APP_DIR/database/dump_logistik.sql" ]; then
     echo "Mengimpor data database lengkap..."
-    mariadb web_scan_logistik < "$APP_DIR/database/dump_logistik.sql"
+    mariadb --binary-mode=1 -u root web_scan_logistik < "$APP_DIR/database/dump_logistik.sql" || true
 fi
 
 # Jalankan migrasi terbaru untuk memastikan tidak ada kolom terlewat
