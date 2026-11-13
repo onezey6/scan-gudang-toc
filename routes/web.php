@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/items/{item}', [ItemController::class, 'destroy'])->name('items.destroy');
     Route::get('/items/generate-code', [ItemController::class, 'generateCode'])->name('items.generate-code');
     Route::get('/barcode-studio', [ItemController::class, 'barcodeStudio'])->name('items.barcode-studio');
+    Route::get('/items/barcode-studio', [ItemController::class, 'barcodeStudio']);
     Route::post('/categories', [ItemController::class, 'storeCategory'])->name('categories.store');
 
     // 2 & 6. Terminal Scan Barcode Masuk & Keluar ke Database Penyimpanan (beserta user petugas scan)
