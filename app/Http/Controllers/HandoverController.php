@@ -126,11 +126,11 @@ class HandoverController extends Controller
             'items.*.availability_status' => ['nullable', 'in:sedia,sedang_keluar,sedang_dipakai,sedang_dipinjam'],
             'items.*.notes' => ['nullable', 'string', 'max:255'],
             'photos' => ['nullable', 'array'],
-            'photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
             'photo_captions' => ['nullable', 'array'],
             'photo_captions.*' => ['nullable', 'string', 'max:255'],
             'evidence_photos' => ['nullable', 'array'],
-            'evidence_photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'evidence_photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
             'evidence_captions' => ['nullable', 'array'],
             'evidence_captions.*' => ['nullable', 'string', 'max:255'],
         ], [
@@ -294,11 +294,11 @@ class HandoverController extends Controller
     {
         $request->validate([
             'photos' => ['nullable', 'array'],
-            'photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
             'photo_captions' => ['nullable', 'array'],
             'photo_captions.*' => ['nullable', 'string', 'max:255'],
             'evidence_photos' => ['nullable', 'array'],
-            'evidence_photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'evidence_photos.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
             'evidence_captions' => ['nullable', 'array'],
             'evidence_captions.*' => ['nullable', 'string', 'max:255'],
         ]);

@@ -555,20 +555,70 @@
 
     function updateTotalPhotosCounter() {
         var total = 0;
+        var totalBytes = 0;
         document.querySelectorAll('input[name="evidence_photos[]"]').forEach(function (inp) {
             if (inp.files) {
                 total += inp.files.length;
+                Array.from(inp.files).forEach(function (f) { totalBytes += f.size || 0; });
             }
         });
         var counter = document.getElementById('total-photos-counter');
         if (counter) {
-            counter.textContent = total + ' Foto Terpilih';
+            var sizeMb = (totalBytes / (1024 * 1024)).toFixed(1);
+            counter.textContent = total > 0 ? (total + ' Foto Terpilih (' + sizeMb + ' MB)') : '0 Foto Terpilih';
             if (total > 0) {
                 counter.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow-sm';
             } else {
                 counter.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-300';
             }
         }
+    }
+
+    function compressImageFile(file, maxDimension, quality) {
+        return new Promise(function (resolve) {
+            if (!file.type || !file.type.startsWith('image/') || file.size <= 450 * 1024) {
+                resolve(file);
+                return;
+            }
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function () {
+                URL.revokeObjectURL(url);
+                var w = img.width;
+                var h = img.height;
+                if (w > maxDimension || h > maxDimension) {
+                    if (w > h) {
+                        h = Math.round((h * maxDimension) / w);
+                        w = maxDimension;
+                    } else {
+                        w = Math.round((w * maxDimension) / h);
+                        h = maxDimension;
+                    }
+                }
+                var canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                canvas.toBlob(function (blob) {
+                    if (!blob || blob.size >= file.size) {
+                        resolve(file);
+                        return;
+                    }
+                    var baseName = file.name.replace(/\.[^/.]+$/, '');
+                    var compressedFile = new File([blob], baseName + '.jpg', {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    resolve(compressedFile);
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = function () {
+                URL.revokeObjectURL(url);
+                resolve(file);
+            };
+            img.src = url;
+        });
     }
 
     function addEvidencePhotoSlot() {
@@ -594,7 +644,8 @@
         if (!thumbs) return;
         thumbs.innerHTML = '';
         if (input.files && input.files.length > 0) {
-            Array.from(input.files).forEach(function (file) {
+            var rawFiles = Array.from(input.files);
+            rawFiles.forEach(function (file) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     var thumbWrapper = document.createElement('div');
@@ -607,8 +658,21 @@
                 };
                 reader.readAsDataURL(file);
             });
+            updateTotalPhotosCounter();
+
+            if (typeof DataTransfer !== 'undefined') {
+                Promise.all(rawFiles.map(function (f) {
+                    return compressImageFile(f, 1600, 0.82);
+                })).then(function (compressedFiles) {
+                    var dt = new DataTransfer();
+                    compressedFiles.forEach(function (cf) { dt.items.add(cf); });
+                    input.files = dt.files;
+                    updateTotalPhotosCounter();
+                }).catch(function () {});
+            }
+        } else {
+            updateTotalPhotosCounter();
         }
-        updateTotalPhotosCounter();
     }
 
     // Simple Signature Pad Implementation

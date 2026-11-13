@@ -216,7 +216,9 @@
                 <div id="detail-photo-slots" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="p-2.5 rounded-lg border border-slate-200 bg-white space-y-2">
                         <input type="file" name="evidence_photos[]" accept="image/jpeg,image/png,image/webp" multiple required
+                               onchange="compressDetailSlotFiles(this)"
                                class="block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">
+                        <div class="slot-compress-status text-[10px] text-emerald-700 font-semibold hidden"></div>
                         <input type="text" name="evidence_captions[]" placeholder="Keterangan foto bukti..."
                                class="w-full px-2.5 py-1.5 rounded-md border border-slate-300 text-xs">
                     </div>
@@ -238,12 +240,94 @@
         var div = document.createElement('div');
         div.className = 'p-2.5 rounded-lg border border-slate-200 bg-white space-y-2';
         div.innerHTML =
-            '<input type="file" name="evidence_photos[]" accept="image/jpeg,image/png,image/webp" multiple required class="block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">' +
+            '<input type="file" name="evidence_photos[]" accept="image/jpeg,image/png,image/webp" multiple required onchange="compressDetailSlotFiles(this)" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer">' +
+            '<div class="slot-compress-status text-[10px] text-emerald-700 font-semibold hidden"></div>' +
             '<div class="flex gap-1.5">' +
                 '<input type="text" name="evidence_captions[]" placeholder="Keterangan foto bukti..." class="flex-1 px-2.5 py-1.5 rounded-md border border-slate-300 text-xs">' +
                 '<button type="button" onclick="this.closest(\'.p-2\\\\.5\').remove()" class="px-2 text-rose-600 font-bold text-xs">&times;</button>' +
             '</div>';
         container.appendChild(div);
+    }
+
+    function compressImageFile(file, maxDimension, quality) {
+        maxDimension = maxDimension || 1600;
+        quality = quality || 0.82;
+        return new Promise(function(resolve) {
+            if (!file.type || !file.type.startsWith('image/')) {
+                resolve(file);
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var img = new Image();
+                img.onload = function() {
+                    var width = img.width;
+                    var height = img.height;
+                    if (width > maxDimension || height > maxDimension) {
+                        if (width >= height) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        } else {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    } else if (file.size <= 450 * 1024) {
+                        resolve(file);
+                        return;
+                    }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(function(blob) {
+                        if (!blob || blob.size >= file.size) {
+                            resolve(file);
+                            return;
+                        }
+                        var baseName = file.name.replace(/\.[^/.]+$/, '');
+                        var compressedFile = new File([blob], baseName + '.jpg', {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        resolve(compressedFile);
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = function() { resolve(file); };
+                img.src = event.target.result;
+            };
+            reader.onerror = function() { resolve(file); };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function compressDetailSlotFiles(input) {
+        if (!input.files || input.files.length === 0) return;
+        var card = input.closest('.p-2\\.5');
+        var statusEl = card ? card.querySelector('.slot-compress-status') : null;
+        if (statusEl) {
+            statusEl.classList.remove('hidden');
+            statusEl.textContent = 'Mengoptimalkan ukuran foto HD...';
+        }
+        var rawFiles = Array.from(input.files);
+        var compressedFiles = await Promise.all(rawFiles.map(function(f) {
+            return compressImageFile(f, 1600, 0.82);
+        }));
+        try {
+            if (typeof DataTransfer !== 'undefined') {
+                var dt = new DataTransfer();
+                compressedFiles.forEach(function(cf) { dt.items.add(cf); });
+                input.files = dt.files;
+            }
+        } catch (err) {
+            // Fallback ke file asli bila browser tidak mendukung DataTransfer
+        }
+        if (statusEl) {
+            var totalBytes = 0;
+            Array.from(input.files).forEach(function(f) { totalBytes += (f.size || 0); });
+            var totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+            statusEl.textContent = input.files.length + ' foto siap diunggah (' + totalMB + ' MB HD)';
+        }
     }
 </script>
 @endpush
