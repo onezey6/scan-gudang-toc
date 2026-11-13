@@ -290,6 +290,17 @@
                 </div>
 
                 <input type="hidden" name="remember" value="1">
+                <input type="hidden" name="latitude" id="login_lat" value="">
+                <input type="hidden" name="longitude" id="login_lng" value="">
+
+                <!-- Lupa Password & Submit Section -->
+                <div class="flex items-center justify-between text-xs pt-0.5">
+                    <span class="text-[10px] text-slate-500 font-mono tracking-wider">TOC SECURE AUTH</span>
+                    <a href="{{ route('password.request') }}"
+                       class="text-[11px] font-bold text-[#22d3ee] hover:text-cyan-200 hover:underline transition-colors">
+                        Lupa Kata Sandi / PIN?
+                    </a>
+                </div>
 
                 <!-- Submit Button: BUKA_AKSES_SISTEM -->
                 <div class="pt-1">
@@ -321,6 +332,25 @@
     </footer>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var latEl = document.getElementById('login_lat');
+                    var lngEl = document.getElementById('login_lng');
+                    if (latEl && lngEl) {
+                        latEl.value = position.coords.latitude;
+                        lngEl.value = position.coords.longitude;
+                    }
+                }, function (error) {
+                    // Fallback tenang jika izin lokasi browser dinonaktifkan
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 8000,
+                    maximumAge: 0
+                });
+            }
+        });
+
         function togglePassVisibility() {
             var passInput = document.getElementById('password');
             var eyeOpen = document.getElementById('icon-eye-open');

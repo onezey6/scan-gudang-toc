@@ -3,11 +3,13 @@
 use App\Http\Controllers\AccessLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\HandoverController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\TrashController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,6 +22,12 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+
+    // Lupa Password Routes (via Email / No HP)
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetCode'])->name('password.email');
+    Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 });
 
 // Authenticated Logistics Routes
@@ -54,9 +62,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/handovers/create', [HandoverController::class, 'create'])->name('handovers.create');
     Route::post('/handovers', [HandoverController::class, 'store'])->name('handovers.store');
     Route::get('/handovers/{handover}', [HandoverController::class, 'show'])->name('handovers.show');
+    Route::delete('/handovers/{handover}', [HandoverController::class, 'destroy'])->name('handovers.destroy');
     Route::get('/handovers/{handover}/print', [HandoverController::class, 'print'])->name('handovers.print');
     Route::post('/handovers/{handover}/photos', [HandoverController::class, 'uploadPhotos'])->name('handovers.photos.store');
     Route::delete('/handovers/{handover}/photos/{photo}', [HandoverController::class, 'destroyPhoto'])->name('handovers.photos.destroy');
+
+    // Menu Sampah (Recycle Bin / Kotak Sampah)
+    Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
+    Route::post('/trash/handovers/{id}/restore', [TrashController::class, 'restoreHandover'])->name('trash.handovers.restore');
+    Route::delete('/trash/handovers/{id}/force', [TrashController::class, 'forceDeleteHandover'])->name('trash.handovers.force-delete');
+    Route::post('/trash/items/{id}/restore', [TrashController::class, 'restoreItem'])->name('trash.items.restore');
+    Route::delete('/trash/items/{id}/force', [TrashController::class, 'forceDeleteItem'])->name('trash.items.force-delete');
+    Route::post('/trash/restore-all', [TrashController::class, 'restoreAll'])->name('trash.restore-all');
+    Route::delete('/trash/empty', [TrashController::class, 'emptyTrash'])->name('trash.empty');
 
     // 7. History Akses Keluar-Masuk Web (Audit Log)
     Route::get('/access-logs', [AccessLogController::class, 'index'])->name('access-logs.index');

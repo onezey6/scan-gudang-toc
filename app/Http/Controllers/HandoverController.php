@@ -312,6 +312,22 @@ class HandoverController extends Controller
         return back()->with('success', "{$count} foto bukti dokumentasi berhasil ditambahkan ke dokumen {$handover->document_no}.");
     }
 
+    public function destroy(Request $request, HandoverDocument $handover)
+    {
+        $docNo = $handover->document_no;
+        $handover->delete();
+
+        AccessLog::record(
+            'activity',
+            "Memindahkan Berita Acara {$docNo} ke Sampah (Soft Delete)",
+            Auth::user(),
+            $request
+        );
+
+        return redirect()->route('handovers.index')
+            ->with('success', "Berita Acara {$docNo} berhasil dipindahkan ke Sampah. Anda dapat memulihkannya kapan saja di Menu Sampah.");
+    }
+
     public function destroyPhoto(HandoverDocument $handover, HandoverPhoto $photo)
     {
         if (!empty($photo->photo_path) && str_starts_with($photo->photo_path, 'uploads/handovers/')) {

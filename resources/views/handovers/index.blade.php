@@ -52,21 +52,33 @@
             <a href="{{ route('items.index') }}" class="text-xs font-semibold text-emerald-600 hover:underline">Lihat Semua Barang &rarr;</a>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <a href="{{ route('items.index', ['availability_status' => 'sedia']) }}" class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 flex items-center justify-between">
-                <span class="text-xs font-bold text-emerald-800">● Sedia</span>
-                <strong class="text-lg font-extrabold text-emerald-700">{{ $summary['status_sedia'] ?? 0 }}</strong>
+            <a href="{{ route('items.index', ['availability_status' => 'sedia']) }}"
+               class="p-3 rounded-xl border border-emerald-300/80 bg-emerald-50/50 hover:bg-emerald-100/60 flex items-center justify-between transition-all shadow-2xs">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-800 uppercase">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>Sedia
+                </span>
+                <strong class="text-lg font-extrabold text-emerald-700 font-mono-code">{{ $summary['status_sedia'] ?? 0 }}</strong>
             </a>
-            <a href="{{ route('items.index', ['availability_status' => 'sedang_keluar']) }}" class="p-3 rounded-xl border border-amber-200 bg-amber-50/50 flex items-center justify-between">
-                <span class="text-xs font-bold text-amber-800">● Sedang Keluar</span>
-                <strong class="text-lg font-extrabold text-amber-700">{{ $summary['status_sedang_keluar'] ?? 0 }}</strong>
+            <a href="{{ route('items.index', ['availability_status' => 'sedang_keluar']) }}"
+               class="p-3 rounded-xl border border-amber-300/80 bg-amber-50/50 hover:bg-amber-100/60 flex items-center justify-between transition-all shadow-2xs">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-amber-800 uppercase">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>Sedang Keluar
+                </span>
+                <strong class="text-lg font-extrabold text-amber-700 font-mono-code">{{ $summary['status_sedang_keluar'] ?? 0 }}</strong>
             </a>
-            <a href="{{ route('items.index', ['availability_status' => 'sedang_dipakai']) }}" class="p-3 rounded-xl border border-cyan-200 bg-cyan-50/50 flex items-center justify-between">
-                <span class="text-xs font-bold text-cyan-800">● Sedang Dipakai</span>
-                <strong class="text-lg font-extrabold text-cyan-700">{{ $summary['status_sedang_dipakai'] ?? 0 }}</strong>
+            <a href="{{ route('items.index', ['availability_status' => 'sedang_dipakai']) }}"
+               class="p-3 rounded-xl border border-cyan-300/80 bg-cyan-50/50 hover:bg-cyan-100/60 flex items-center justify-between transition-all shadow-2xs">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-cyan-800 uppercase">
+                    <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>Sedang Dipakai
+                </span>
+                <strong class="text-lg font-extrabold text-cyan-700 font-mono-code">{{ $summary['status_sedang_dipakai'] ?? 0 }}</strong>
             </a>
-            <a href="{{ route('items.index', ['availability_status' => 'sedang_dipinjam']) }}" class="p-3 rounded-xl border border-indigo-200 bg-indigo-50/50 flex items-center justify-between">
-                <span class="text-xs font-bold text-indigo-800">● Sedang Dipinjam</span>
-                <strong class="text-lg font-extrabold text-indigo-700">{{ $summary['status_sedang_dipinjam'] ?? 0 }}</strong>
+            <a href="{{ route('items.index', ['availability_status' => 'sedang_dipinjam']) }}"
+               class="p-3 rounded-xl border border-indigo-300/80 bg-indigo-50/50 hover:bg-indigo-100/60 flex items-center justify-between transition-all shadow-2xs">
+                <span class="inline-flex items-center gap-1.5 text-xs font-extrabold text-indigo-800 uppercase">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>Sedang Dipinjam
+                </span>
+                <strong class="text-lg font-extrabold text-indigo-700 font-mono-code">{{ $summary['status_sedang_dipinjam'] ?? 0 }}</strong>
             </a>
         </div>
     </div>
@@ -201,6 +213,14 @@
                                             Buat BAP Kembali
                                         </a>
                                     @endif
+                                    <form action="{{ route('handovers.destroy', $doc) }}" method="POST" class="inline"
+                                          onsubmit="return confirm('Pindahkan Berita Acara {{ $doc->document_no }} ini ke Sampah?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Pindahkan ke Sampah" class="px-2 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-50 text-rose-600 text-xs font-semibold">
+                                            Hapus
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

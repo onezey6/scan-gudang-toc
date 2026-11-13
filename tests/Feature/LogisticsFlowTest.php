@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AccessLog;
 use App\Models\HandoverDocument;
 use App\Models\Item;
 use App\Models\User;
@@ -227,5 +228,113 @@ class LogisticsFlowTest extends TestCase
         $this->get('/handovers/' . $handover->id . '/print')->assertStatus(200);
         $this->get('/access-logs')->assertStatus(200);
         $this->get('/profile')->assertStatus(200);
+        $this->get('/trash')->assertStatus(200);
+
+        // Guest page
+        auth()->logout();
+        $this->get('/forgot-password')->assertStatus(200);
+    }
+
+    public function test_handover_deletion_and_trash_restore_flow(): void
+    {
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+
+        // Buat dummy handover untuk dites hapus
+        $handover = HandoverDocument::create([
+            'document_no' => 'BAST-TEST-DEL-001',
+            'document_type' => 'bast',
+            'loan_type' => 'pinjam_pakai',
+            'item_status_target' => 'sedang_dipinjam',
+            'document_date' => now()->toDateString(),
+            'first_party_name' => 'Petugas Satu',
+            'second_party_name' => 'Penerima Dua',
+            'user_id' => $admin->id,
+            'status' => 'active',
+        ]);
+
+        // 1. Soft delete handover
+        $resDelete = $this->delete(route('handovers.destroy', $handover));
+        $resDelete->assertRedirect(route('handovers.index'));
+        $this->assertSoftDeleted('handover_documents', ['id' => $handover->id]);
+
+        // 2. Buka menu sampah
+        $resTrash = $this->get('/trash');
+        $resTrash->assertStatus(200);
+        $resTrash->assertSee('BAST-TEST-DEL-001');
+
+        // 3. Restore handover dari sampah
+        $resRestore = $this->post(route('trash.handovers.restore', $handover->id));
+        $resRestore->assertRedirect();
+        $this->assertNotSoftDeleted('handover_documents', ['id' => $handover->id]);
+
+        // 4. Force delete handover
+        $this->delete(route('handovers.destroy', $handover));
+        $resForce = $this->delete(route('trash.handovers.force-delete', $handover->id));
+        $resForce->assertRedirect();
+        $this->assertDatabaseMissing('handover_documents', ['id' => $handover->id]);
+    }
+
+    public function test_forgot_password_and_reset_flow(): void
+    {
+        $user = User::where('email', 'rina@logiscan.id')->firstOrFail();
+
+        // 1. Ajukan reset via username / email
+        $resRequest = $this->post('/forgot-password', [
+            'identity' => 'rina.staff',
+            'reset_channel' => 'email',
+        ]);
+        $resRequest->assertRedirect(route('password.reset'));
+
+        // Cek OTP di session
+        $otp = session('reset_demo_otp');
+        $this->assertNotNull($otp);
+        $this->assertEquals(6, strlen($otp));
+
+        // 2. Submit password baru
+        $resReset = $this->post('/reset-password', [
+            'otp' => $otp,
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ]);
+        $resReset->assertRedirect(route('login'));
+
+        // 3. Login dengan password baru
+        $resLogin = $this->post('/login', [
+            'login' => 'rina.staff',
+            'password' => 'newpassword123',
+        ]);
+        $resLogin->assertRedirect(route('dashboard'));
+    }
+
+    public function test_access_log_records_location_and_admin_only_visibility(): void
+    {
+        // 1. Login dengan koordinat lokasi
+        $resLogin = $this->post('/login', [
+            'login' => 'admin',
+            'password' => 'password123',
+            'latitude' => -6.353372,
+            'longitude' => 106.848831,
+        ]);
+        $resLogin->assertRedirect(route('dashboard'));
+
+        $latestLog = AccessLog::latest('id')->firstOrFail();
+        $this->assertEquals(-6.353372, round($latestLog->latitude, 6));
+        $this->assertEquals(106.848831, round($latestLog->longitude, 6));
+        $this->assertStringContainsString('maps?q=', $latestLog->google_maps_url);
+
+        // 2. Admin melihat link Google Maps di halaman log akses
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+        $resAdmin = $this->get('/access-logs');
+        $resAdmin->assertStatus(200);
+        $resAdmin->assertSee('📍 Buka Google Maps');
+
+        // 3. Non-admin (staff) TIDAK melihat link Google Maps
+        $staff = User::where('role', 'staff')->firstOrFail();
+        $this->actingAs($staff);
+        $resStaff = $this->get('/access-logs');
+        $resStaff->assertStatus(200);
+        $resStaff->assertDontSee('📍 Buka Google Maps');
     }
 }

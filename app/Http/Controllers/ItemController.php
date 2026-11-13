@@ -213,19 +213,18 @@ class ItemController extends Controller
         $user = Auth::user();
         $itemName = $item->name;
         $itemBarcode = $item->barcode;
-        $this->deletePhotoFile($item->photo_path);
 
         $item->delete();
 
         AccessLog::record(
             'activity',
-            "Menghapus barang dari penyimpanan: {$itemName} (Barcode: {$itemBarcode})",
+            "Memindahkan barang ke Sampah: {$itemName} (Barcode: {$itemBarcode})",
             $user,
             $request
         );
 
         return redirect()->route('items.index')
-            ->with('success', "Barang \"{$itemName}\" telah dihapus.");
+            ->with('success', "Barang \"{$itemName}\" telah dipindahkan ke Sampah. Anda dapat memulihkannya kapan saja di Menu Sampah.");
     }
 
     public function generateCode()

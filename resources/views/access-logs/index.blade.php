@@ -86,6 +86,9 @@
                         <th class="py-3.5 px-4">Status Keluar / Masuk Web</th>
                         <th class="py-3.5 px-4">Detail Aktivitas</th>
                         <th class="py-3.5 px-4">IP Address & Perangkat</th>
+                        @if (auth()->user()->isAdmin())
+                            <th class="py-3.5 px-4">Lokasi Real-Time (Admin Only)</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200/80 text-sm">
@@ -132,10 +135,31 @@
                                 <div class="font-mono-code text-xs font-semibold text-slate-800">{{ $log->ip_address }}</div>
                                 <div class="text-xs text-slate-500 mt-0.5">{{ $log->device_browser }}</div>
                             </td>
+
+                            @if (auth()->user()->isAdmin())
+                                <td class="py-3.5 px-4 align-top">
+                                    @if ($log->google_maps_url)
+                                        <div class="space-y-1">
+                                            <a href="{{ $log->google_maps_url }}" target="_blank"
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-2xs transition-all">
+                                                <span>📍 Buka Google Maps</span>
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                            <div class="font-mono-code text-[10px] text-slate-500">
+                                                {{ number_format($log->latitude, 5) }}, {{ number_format($log->longitude, 5) }}
+                                            </div>
+                                        </div>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 text-[11px] text-slate-400 italic">
+                                            <span>GPS Offline</span>
+                                        </span>
+                                    @endif
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-10 text-center text-sm text-slate-500">
+                            <td colspan="{{ auth()->user()->isAdmin() ? 6 : 5 }}" class="py-10 text-center text-sm text-slate-500">
                                 Tidak ada riwayat akses web yang sesuai dengan filter.
                             </td>
                         </tr>

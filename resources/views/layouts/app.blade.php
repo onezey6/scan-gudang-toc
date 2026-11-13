@@ -169,6 +169,7 @@
         html.theme-cyber .bg-rose-100 { background-color: rgba(244, 63, 94, 0.18) !important; }
         html.theme-cyber .bg-indigo-50 { background-color: rgba(129, 140, 248, 0.12) !important; }
         html.theme-cyber .bg-blue-50 { background-color: rgba(56, 189, 248, 0.12) !important; }
+        html.theme-cyber .bg-cyan-50, html.theme-cyber .bg-cyan-50\/50, html.theme-cyber .bg-cyan-100 { background-color: rgba(6, 182, 212, 0.12) !important; }
         html.theme-cyber .from-emerald-50 { background-image: none !important; background-color: rgba(16, 185, 129, 0.10) !important; }
         html.theme-cyber .from-rose-50 { background-image: none !important; background-color: rgba(244, 63, 94, 0.10) !important; }
         html.theme-cyber .from-slate-50 { background-image: none !important; background-color: rgba(34, 211, 238, 0.05) !important; }
@@ -196,6 +197,8 @@
         html.theme-cyber .text-rose-600, html.theme-cyber .text-rose-700,
         html.theme-cyber .text-rose-800, html.theme-cyber .text-rose-900 { color: #fb7185 !important; }
         html.theme-cyber .text-indigo-600, html.theme-cyber .text-indigo-700 { color: #a5b4fc !important; }
+        html.theme-cyber .text-cyan-600, html.theme-cyber .text-cyan-700,
+        html.theme-cyber .text-cyan-800 { color: #22d3ee !important; text-shadow: 0 0 10px rgba(34, 211, 238, 0.25); }
         html.theme-cyber .text-blue-600, html.theme-cyber .text-blue-700 { color: #7dd3fc !important; }
         html.theme-cyber thead th { color: #67e8f9 !important; letter-spacing: 0.08em; }
 
@@ -212,6 +215,7 @@
         html.theme-cyber .border-amber-200, html.theme-cyber .border-amber-200\/70 { border-color: rgba(251, 191, 36, 0.35) !important; }
         html.theme-cyber .border-rose-200, html.theme-cyber .border-rose-200\/80 { border-color: rgba(251, 113, 133, 0.35) !important; }
         html.theme-cyber .border-indigo-200, html.theme-cyber .border-blue-200 { border-color: rgba(129, 140, 248, 0.35) !important; }
+        html.theme-cyber .border-cyan-200, html.theme-cyber .border-cyan-300 { border-color: rgba(34, 211, 238, 0.38) !important; }
         html.theme-cyber .ring-white { --tw-ring-color: #05070D !important; }
 
         /* Formulir */
@@ -363,8 +367,20 @@
                     'color' => 'text-fuchsia-400',
                     'bg' => 'bg-fuchsia-500/15 border-fuchsia-400/30 text-fuchsia-400 shadow-[0_0_12px_rgba(232,121,249,0.25)]',
                 ],
+                [
+                    'route' => 'trash.index',
+                    'active' => 'trash.*',
+                    'code' => '09',
+                    'label' => 'Menu Sampah (Trash)',
+                    'badge' => 'trash',
+                    'icon' => 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16',
+                    'color' => 'text-amber-400',
+                    'bg' => 'bg-amber-500/15 border-amber-400/30 text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.25)]',
+                ],
             ],
         ];
+
+        $globalTrashCount = \App\Models\HandoverDocument::onlyTrashed()->count() + \App\Models\Item::onlyTrashed()->count();
     @endphp
 
     <div class="min-h-screen flex flex-col lg:flex-row">
@@ -412,6 +428,11 @@
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full {{ $isActive ? 'bg-white/20 text-white' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' }}">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
                                     LIVE
+                                </span>
+                            @endif
+                            @if (($menu['badge'] ?? null) === 'trash' && $globalTrashCount > 0)
+                                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full {{ $isActive ? 'bg-white text-rose-700' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40' }}">
+                                    {{ $globalTrashCount }}
                                 </span>
                             @endif
                         </a>
@@ -700,6 +721,11 @@
                                             </div>
                                             @if (!empty($menu['live']))
                                                 <span class="px-1.5 py-0.5 text-[9px] font-bold rounded-full {{ $isActive ? 'bg-white/20 text-white' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' }}">LIVE</span>
+                                            @endif
+                                            @if (($menu['badge'] ?? null) === 'trash' && $globalTrashCount > 0)
+                                                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded-full {{ $isActive ? 'bg-white text-rose-700' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40' }}">
+                                                    {{ $globalTrashCount }}
+                                                </span>
                                             @endif
                                         </a>
                                     @endforeach

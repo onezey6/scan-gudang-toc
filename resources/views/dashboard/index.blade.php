@@ -138,47 +138,67 @@
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <a href="{{ route('items.index', ['availability_status' => 'sedia']) }}"
-               class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 flex items-center justify-between transition-all">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase text-emerald-800">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>Sedia
+               class="p-4 rounded-xl border border-emerald-300/80 bg-emerald-50/50 hover:bg-emerald-100/60 flex flex-col justify-between transition-all group shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-100/90 text-[10px] font-extrabold uppercase text-emerald-800 border border-emerald-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>SEDIA
                     </div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">Siap di Gudang</div>
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
                 </div>
-                <div class="text-2xl font-extrabold text-emerald-700">{{ $stats['status_sedia'] ?? 0 }}</div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span class="text-xs text-slate-600 font-medium">Siap di Gudang</span>
+                    <span class="text-2xl font-extrabold text-emerald-700 font-mono-code">{{ $stats['status_sedia'] ?? 0 }}</span>
+                </div>
             </a>
 
             <a href="{{ route('items.index', ['availability_status' => 'sedang_keluar']) }}"
-               class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 flex items-center justify-between transition-all">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase text-amber-800">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>Sedang Keluar
+               class="p-4 rounded-xl border border-amber-300/80 bg-amber-50/50 hover:bg-amber-100/60 flex flex-col justify-between transition-all group shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-100/90 text-[10px] font-extrabold uppercase text-amber-800 border border-amber-300">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>SEDANG KELUAR
                     </div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">Mutasi Keluar</div>
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                    </div>
                 </div>
-                <div class="text-2xl font-extrabold text-amber-700">{{ $stats['status_sedang_keluar'] ?? 0 }}</div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span class="text-xs text-slate-600 font-medium">Mutasi Keluar</span>
+                    <span class="text-2xl font-extrabold text-amber-700 font-mono-code">{{ $stats['status_sedang_keluar'] ?? 0 }}</span>
+                </div>
             </a>
 
             <a href="{{ route('items.index', ['availability_status' => 'sedang_dipakai']) }}"
-               class="p-3.5 rounded-xl border border-cyan-200 bg-cyan-50/50 hover:bg-cyan-50 flex items-center justify-between transition-all">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase text-cyan-800">
-                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span>Sedang Dipakai
+               class="p-4 rounded-xl border border-cyan-300/80 bg-cyan-50/50 hover:bg-cyan-100/60 flex flex-col justify-between transition-all group shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-100/90 text-[10px] font-extrabold uppercase text-cyan-800 border border-cyan-300">
+                        <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>SEDANG DIPAKAI
                     </div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">Giat Operasional</div>
+                    <div class="w-7 h-7 rounded-lg bg-cyan-500/15 text-cyan-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
                 </div>
-                <div class="text-2xl font-extrabold text-cyan-700">{{ $stats['status_sedang_dipakai'] ?? 0 }}</div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span class="text-xs text-slate-600 font-medium">Giat Operasional</span>
+                    <span class="text-2xl font-extrabold text-cyan-700 font-mono-code">{{ $stats['status_sedang_dipakai'] ?? 0 }}</span>
+                </div>
             </a>
 
             <a href="{{ route('items.index', ['availability_status' => 'sedang_dipinjam']) }}"
-               class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 flex items-center justify-between transition-all">
-                <div>
-                    <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase text-indigo-800">
-                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>Sedang Dipinjam
+               class="p-4 rounded-xl border border-indigo-300/80 bg-indigo-50/50 hover:bg-indigo-100/60 flex flex-col justify-between transition-all group shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-100/90 text-[10px] font-extrabold uppercase text-indigo-800 border border-indigo-300">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>SEDANG DIPINJAM
                     </div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">Pinjam Pakai BAST</div>
+                    <div class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
                 </div>
-                <div class="text-2xl font-extrabold text-indigo-700">{{ $stats['status_sedang_dipinjam'] ?? 0 }}</div>
+                <div class="mt-3 flex items-baseline justify-between">
+                    <span class="text-xs text-slate-600 font-medium">Pinjam Pakai BAST</span>
+                    <span class="text-2xl font-extrabold text-indigo-700 font-mono-code">{{ $stats['status_sedang_dipinjam'] ?? 0 }}</span>
+                </div>
             </a>
         </div>
     </div>

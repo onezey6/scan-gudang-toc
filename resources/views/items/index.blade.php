@@ -147,7 +147,7 @@
 
                             <td class="py-3.5 px-4 align-top">
                                 <div class="flex flex-wrap items-center gap-1.5">
-                                    @php $avStatus = $item->availability_status ?? 'sedia'; @endphp
+                                    @php $avStatus = $item->availability_status ?: 'sedia'; @endphp
                                     @if ($avStatus === 'sedia')
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Sedia
@@ -273,7 +273,7 @@
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-1.5">
                                 <span class="font-mono-code text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/80">{{ $item->item_code }}</span>
-                                @php $avStatus = $item->availability_status ?? 'sedia'; @endphp
+                                @php $avStatus = $item->availability_status ?: 'sedia'; @endphp
                                 @if ($avStatus === 'sedia')
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Sedia
