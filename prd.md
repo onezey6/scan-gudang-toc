@@ -365,3 +365,12 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   3. Menambahkan mesin pembaca barcode multi-engine (`BarcodeDetector` bawaan Chrome Android + `Html5Qrcode.scanFile` dengan kompresi gambar dan peningkat kontras otomatis) serta tombol pintas 1-klik ke **Mode Video Live (HTTPS)**.
 - **2026-11-13 (Hotfix Parameter Route Hapus Foto Bukti Berita Acara):**
   Memperbaiki parameter route form tombol hapus foto bukti pada `resources/views/handovers/show.blade.php` baris 190 menjadi `route('handovers.photos.destroy', [$handover, $photo])`. Menyelesaikan kendala `UrlGenerationException` saat membuka halaman detail Berita Acara yang memiliki lampiran foto bukti.
+- **2026-11-13 (Format Cetak Stiker Barcode Kertas Label Blueprint GL-22 & GL-06):**
+  1. Penambahan pemilih format stiker di **Studio Pembuat Barcode** (`/items/barcode-studio`) yang mendukung ukuran standar kertas stiker Blueprint:
+     - **BLUEPRINT GL-22 (64.5 x 47 mm):** 18 Label per lembar A4 (3 Kolom x 6 Baris), ukuran proporsional untuk stiker fisik peralatan & unit inventaris.
+     - **BLUEPRINT GL-06 (96 x 93.1 mm):** 6 Label per lembar A4 (2 Kolom x 3 Baris), ukuran stiker besar kotak untuk dus kemasan/kontainer/rak gudang.
+     - **Label Thermal Roll (50 x 30 mm):** Untuk cetak satuan pada printer barcode thermal roll.
+     - **Kertas HVS A4 Fleksibel:** 3 kolom standar untuk cetak pada kertas HVS biasa lalu dipotong manual.
+  2. Implementasi CSS `@media print` presisi milimeter (`@page`, `width: 193.5mm`, `grid-template-columns: repeat(3, 64.5mm)`, `grid-auto-rows: 47mm`) sehingga posisi cetak pas dengan pola pisau potong (*die-cut*) stiker Blueprint.
+  3. Desain stiker bernuansa resmi kedinasan `LOGISTIK.TOC`, kode barang, nama barang tebal, barcode Code128 tajam pekat, nomor barcode, lokasi rak, dan badge `TOC GEGANA`.
+  4. Penyertaan kalkulator lembar kertas otomatis (*sheets counter*), filter pencarian barang cepat, dan tombol otomatis paskan 1 lembar penuh A4 (*Quick Fill Sheet*).
