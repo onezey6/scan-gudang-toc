@@ -127,79 +127,350 @@
         </div>
     </div>
 
-    <!-- Sinkronisasi Status Ketersediaan Barang (Sedia, Sedang Keluar, Sedang Dipakai, Sedang Dipinjam) -->
-    <div class="mb-6 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5">
-            <div>
-                <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Status Ketersediaan Barang Gudang (Tersinkronisasi dengan BAST & BAP)</h3>
-                <p class="text-xs text-slate-500">Klik salah satu kartu status untuk melihat daftar barang sesuai statusnya</p>
+    <!-- Panel Status Ketersediaan Barang Berenergi Tinggi (Tactical HUD) & Tabel Informasi Interaktif -->
+    @php
+        $totalStatusCount = max(1, ($stats['status_sedia'] ?? 0) + ($stats['status_sedang_keluar'] ?? 0) + ($stats['status_sedang_dipakai'] ?? 0) + ($stats['status_sedang_dipinjam'] ?? 0));
+        $pctSedia = round((($stats['status_sedia'] ?? 0) / $totalStatusCount) * 100);
+        $pctKeluar = round((($stats['status_sedang_keluar'] ?? 0) / $totalStatusCount) * 100);
+        $pctDipakai = round((($stats['status_sedang_dipakai'] ?? 0) / $totalStatusCount) * 100);
+        $pctDipinjam = round((($stats['status_sedang_dipinjam'] ?? 0) / $totalStatusCount) * 100);
+    @endphp
+    <div class="mb-6 bg-white rounded-2xl border-2 border-cyan-500/30 shadow-lg overflow-hidden">
+        <!-- Header Panel -->
+        <div class="p-4 sm:p-5 bg-gradient-to-r from-[#070D18] via-[#0B1528] to-[#070D18] border-b border-cyan-500/20 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-emerald-500/30 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)] shrink-0">
+                    <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm sm:text-base font-extrabold uppercase tracking-wide text-white">Status Ketersediaan Barang Gudang (Real-Time HUD)</h3>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-black uppercase tracking-wider animate-pulse">SYNC BAST & BAP</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-0.5">Klik salah satu kartu di bawah untuk menyaring <strong>Tabel Informasi Barang</strong> secara instan</p>
+                </div>
             </div>
-            <a href="{{ route('handovers.index') }}" class="text-xs font-bold text-emerald-600 hover:underline">Kelola Pinjam Pakai (BAST/BAP) &rarr;</a>
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+                <a href="{{ route('handovers.index') }}"
+                   class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-300 border border-cyan-400/40 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+                    <span>Kelola Dokumen BAST & BAP</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <a href="{{ route('items.index', ['availability_status' => 'sedia']) }}"
-               class="p-4 rounded-xl border border-emerald-300/80 bg-emerald-50/50 hover:bg-emerald-100/60 flex flex-col justify-between transition-all group shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-100/90 text-[10px] font-extrabold uppercase text-emerald-800 border border-emerald-300">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>SEDIA
-                    </div>
-                    <div class="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <span class="text-xs text-slate-600 font-medium">Siap di Gudang</span>
-                    <span class="text-2xl font-extrabold text-emerald-700 font-mono-code">{{ $stats['status_sedia'] ?? 0 }}</span>
-                </div>
-            </a>
 
-            <a href="{{ route('items.index', ['availability_status' => 'sedang_keluar']) }}"
-               class="p-4 rounded-xl border border-amber-300/80 bg-amber-50/50 hover:bg-amber-100/60 flex flex-col justify-between transition-all group shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-100/90 text-[10px] font-extrabold uppercase text-amber-800 border border-amber-300">
-                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>SEDANG KELUAR
+        <div class="p-4 sm:p-5 space-y-5">
+            <!-- 4 Kartu Status Berenergi Tinggi (Vibrant Tactical Glow HUD) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- 1. SEDIA (Neon Emerald) -->
+                <button type="button" onclick="filterStatusTable('sedia')" id="btn-card-sedia"
+                        class="status-filter-card group relative p-4 rounded-2xl bg-gradient-to-br from-[#06241b] via-[#091f1a] to-[#041310] border-2 border-emerald-400/70 hover:border-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_30px_rgba(16,185,129,0.45)] text-left transition-all cursor-pointer active:scale-98 overflow-hidden select-none">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between gap-1 mb-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/60 text-[10px] font-black uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                            SEDIA
+                        </span>
+                        <span class="text-[10px] font-bold font-mono-code px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+                            {{ $pctSedia }}%
+                        </span>
                     </div>
-                    <div class="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                    <div class="text-3xl sm:text-4xl font-extrabold text-emerald-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
+                        {{ $stats['status_sedia'] ?? 0 }}
                     </div>
-                </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <span class="text-xs text-slate-600 font-medium">Mutasi Keluar</span>
-                    <span class="text-2xl font-extrabold text-amber-700 font-mono-code">{{ $stats['status_sedang_keluar'] ?? 0 }}</span>
-                </div>
-            </a>
+                    <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
+                        <span>Siap di Gudang</span>
+                        <span class="text-[10px] text-emerald-400 font-bold group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </div>
+                    <!-- Mini Progress Bar -->
+                    <div class="mt-2 w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-300 rounded-full" style="width: {{ $pctSedia }}%"></div>
+                    </div>
+                </button>
 
-            <a href="{{ route('items.index', ['availability_status' => 'sedang_dipakai']) }}"
-               class="p-4 rounded-xl border border-cyan-300/80 bg-cyan-50/50 hover:bg-cyan-100/60 flex flex-col justify-between transition-all group shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-100/90 text-[10px] font-extrabold uppercase text-cyan-800 border border-cyan-300">
-                        <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>SEDANG DIPAKAI
+                <!-- 2. SEDANG KELUAR (Neon Amber Gold) -->
+                <button type="button" onclick="filterStatusTable('sedang_keluar')" id="btn-card-sedang_keluar"
+                        class="status-filter-card group relative p-4 rounded-2xl bg-gradient-to-br from-[#2a1b05] via-[#201506] to-[#120c03] border-2 border-amber-400/70 hover:border-amber-300 shadow-[0_0_20px_rgba(251,191,36,0.25)] hover:shadow-[0_0_30px_rgba(251,191,36,0.45)] text-left transition-all cursor-pointer active:scale-98 overflow-hidden select-none">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-amber-500/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between gap-1 mb-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/60 text-[10px] font-black uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                            SEDANG KELUAR
+                        </span>
+                        <span class="text-[10px] font-bold font-mono-code px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-500/40">
+                            {{ $pctKeluar }}%
+                        </span>
                     </div>
-                    <div class="w-7 h-7 rounded-lg bg-cyan-500/15 text-cyan-600 flex items-center justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <div class="text-3xl sm:text-4xl font-extrabold text-amber-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(251,191,36,0.5)]">
+                        {{ $stats['status_sedang_keluar'] ?? 0 }}
                     </div>
-                </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <span class="text-xs text-slate-600 font-medium">Giat Operasional</span>
-                    <span class="text-2xl font-extrabold text-cyan-700 font-mono-code">{{ $stats['status_sedang_dipakai'] ?? 0 }}</span>
-                </div>
-            </a>
+                    <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
+                        <span>Mutasi Keluar</span>
+                        <span class="text-[10px] text-amber-400 font-bold group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </div>
+                    <!-- Mini Progress Bar -->
+                    <div class="mt-2 w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-amber-500 to-yellow-300 rounded-full" style="width: {{ $pctKeluar }}%"></div>
+                    </div>
+                </button>
 
-            <a href="{{ route('items.index', ['availability_status' => 'sedang_dipinjam']) }}"
-               class="p-4 rounded-xl border border-indigo-300/80 bg-indigo-50/50 hover:bg-indigo-100/60 flex flex-col justify-between transition-all group shadow-2xs">
-                <div class="flex items-center justify-between">
-                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-100/90 text-[10px] font-extrabold uppercase text-indigo-800 border border-indigo-300">
-                        <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>SEDANG DIPINJAM
+                <!-- 3. SEDANG DIPAKAI (Electric Cyan Operations) -->
+                <button type="button" onclick="filterStatusTable('sedang_dipakai')" id="btn-card-sedang_dipakai"
+                        class="status-filter-card group relative p-4 rounded-2xl bg-gradient-to-br from-[#06202c] via-[#081822] to-[#040e16] border-2 border-cyan-400/70 hover:border-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.25)] hover:shadow-[0_0_30px_rgba(34,211,238,0.45)] text-left transition-all cursor-pointer active:scale-98 overflow-hidden select-none">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-cyan-500/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between gap-1 mb-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/60 text-[10px] font-black uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                            SEDANG DIPAKAI
+                        </span>
+                        <span class="text-[10px] font-bold font-mono-code px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
+                            {{ $pctDipakai }}%
+                        </span>
                     </div>
-                    <div class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-600 flex items-center justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <div class="text-3xl sm:text-4xl font-extrabold text-cyan-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]">
+                        {{ $stats['status_sedang_dipakai'] ?? 0 }}
+                    </div>
+                    <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
+                        <span>Giat Operasional</span>
+                        <span class="text-[10px] text-cyan-400 font-bold group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </div>
+                    <!-- Mini Progress Bar -->
+                    <div class="mt-2 w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-cyan-500 to-sky-300 rounded-full" style="width: {{ $pctDipakai }}%"></div>
+                    </div>
+                </button>
+
+                <!-- 4. SEDANG DIPINJAM (Royal Indigo Protocol) -->
+                <button type="button" onclick="filterStatusTable('sedang_dipinjam')" id="btn-card-sedang_dipinjam"
+                        class="status-filter-card group relative p-4 rounded-2xl bg-gradient-to-br from-[#191538] via-[#120f2b] to-[#0a081a] border-2 border-indigo-400/70 hover:border-indigo-300 shadow-[0_0_20px_rgba(129,140,248,0.25)] hover:shadow-[0_0_30px_rgba(129,140,248,0.45)] text-left transition-all cursor-pointer active:scale-98 overflow-hidden select-none">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-indigo-500/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between gap-1 mb-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/60 text-[10px] font-black uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+                            SEDANG DIPINJAM
+                        </span>
+                        <span class="text-[10px] font-bold font-mono-code px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-500/40">
+                            {{ $pctDipinjam }}%
+                        </span>
+                    </div>
+                    <div class="text-3xl sm:text-4xl font-extrabold text-indigo-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(129,140,248,0.5)]">
+                        {{ $stats['status_sedang_dipinjam'] ?? 0 }}
+                    </div>
+                    <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
+                        <span>Pinjam Pakai BAST</span>
+                        <span class="text-[10px] text-indigo-400 font-bold group-hover:translate-x-1 transition-transform">&rarr;</span>
+                    </div>
+                    <!-- Mini Progress Bar -->
+                    <div class="mt-2 w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-300 rounded-full" style="width: {{ $pctDipinjam }}%"></div>
+                    </div>
+                </button>
+            </div>
+
+            <!-- TABEL INFORMASI RINCIAN BARANG (Interactive Telemetry Table Info) -->
+            <div class="rounded-2xl border border-slate-200/90 overflow-hidden bg-slate-900/40">
+                <!-- Filter Tab Bar & Quick Search -->
+                <div class="p-3 sm:p-4 bg-[#09111E] border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button type="button" onclick="filterStatusTable('all')" id="tab-status-all"
+                                class="tab-status-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 shadow-xs">
+                            Semua Barang ({{ $statusItems->count() }})
+                        </button>
+                        <button type="button" onclick="filterStatusTable('sedia')" id="tab-status-sedia"
+                                class="tab-status-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent">
+                            Sedia ({{ $stats['status_sedia'] ?? 0 }})
+                        </button>
+                        <button type="button" onclick="filterStatusTable('sedang_keluar')" id="tab-status-sedang_keluar"
+                                class="tab-status-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent">
+                            Sedang Keluar ({{ $stats['status_sedang_keluar'] ?? 0 }})
+                        </button>
+                        <button type="button" onclick="filterStatusTable('sedang_dipakai')" id="tab-status-sedang_dipakai"
+                                class="tab-status-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent">
+                            Sedang Dipakai ({{ $stats['status_sedang_dipakai'] ?? 0 }})
+                        </button>
+                        <button type="button" onclick="filterStatusTable('sedang_dipinjam')" id="tab-status-sedang_dipinjam"
+                                class="tab-status-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent">
+                            Sedang Dipinjam ({{ $stats['status_sedang_dipinjam'] ?? 0 }})
+                        </button>
+                    </div>
+                    <div class="relative min-w-[200px]">
+                        <input type="text" id="status_table_search" oninput="searchStatusTable(this.value)"
+                               placeholder="Cari nama / barcode di tabel..."
+                               class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
                     </div>
                 </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <span class="text-xs text-slate-600 font-medium">Pinjam Pakai BAST</span>
-                    <span class="text-2xl font-extrabold text-indigo-700 font-mono-code">{{ $stats['status_sedang_dipinjam'] ?? 0 }}</span>
+
+                <!-- Desktop Table View (MD ke Atas) -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-[#050C16] border-b border-slate-800 text-[10px] font-extrabold uppercase tracking-wider text-cyan-400">
+                                <th class="py-3 px-4">Barang & Barcode</th>
+                                <th class="py-3 px-4">Status Ketersediaan</th>
+                                <th class="py-3 px-4">Kategori & Tipe</th>
+                                <th class="py-3 px-4">Stok Fisik</th>
+                                <th class="py-3 px-4">Lokasi Rak</th>
+                                <th class="py-3 px-4 text-right">Aksi Cepat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="status-table-body" class="divide-y divide-slate-800/80">
+                            @forelse ($statusItems as $stItem)
+                                @php
+                                    $stVal = $stItem->availability_status ?: 'sedia';
+                                    $searchBlob = strtolower($stItem->name . ' ' . $stItem->barcode . ' ' . $stItem->item_code . ' ' . ($stItem->category?->name ?? ''));
+                                @endphp
+                                <tr class="status-table-row hover:bg-slate-800/50 transition-colors"
+                                    data-status="{{ $stVal }}"
+                                    data-keyword="{{ $searchBlob }}">
+                                    <!-- 1. Barang & Barcode -->
+                                    <td class="py-3 px-4 align-middle">
+                                        <div class="flex items-center gap-3">
+                                            @if ($stItem->photo_url)
+                                                <button type="button" onclick="openPhotoLightbox('{{ $stItem->photo_url }}', '{{ addslashes($stItem->name) }}')"
+                                                        class="w-10 h-10 rounded-lg overflow-hidden border border-slate-700 shrink-0 hover:scale-105 transition-transform">
+                                                    <img src="{{ $stItem->photo_url }}" alt="{{ $stItem->name }}" class="w-full h-full object-cover">
+                                                </button>
+                                            @else
+                                                <div class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                                </div>
+                                            @endif
+                                            <div class="min-w-0">
+                                                <div class="font-extrabold text-white text-xs truncate max-w-xs">{{ $stItem->name }}</div>
+                                                <div class="text-[11px] font-mono-code text-cyan-300 mt-0.5">
+                                                    {{ $stItem->barcode }} <span class="text-slate-500">•</span> {{ $stItem->item_code }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- 2. Status Ketersediaan -->
+                                    <td class="py-3 px-4 align-middle">
+                                        @if ($stVal === 'sedia')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] font-black uppercase">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>SEDIA (Gudang)
+                                            </span>
+                                        @elseif ($stVal === 'sedang_keluar')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[10px] font-black uppercase">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>SEDANG KELUAR
+                                            </span>
+                                        @elseif ($stVal === 'sedang_dipakai')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/50 text-[10px] font-black uppercase">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>SEDANG DIPAKAI
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/50 text-[10px] font-black uppercase">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>SEDANG DIPINJAM
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- 3. Kategori & Tipe -->
+                                    <td class="py-3 px-4 align-middle">
+                                        <div class="text-slate-300 font-semibold">{{ $stItem->category?->name ?? 'Umum' }}</div>
+                                        <div class="text-[10px] text-slate-500 uppercase">{{ $stItem->item_type === 'asset' ? 'Aset Inventaris' : 'Habis Pakai' }}</div>
+                                    </td>
+
+                                    <!-- 4. Stok Fisik -->
+                                    <td class="py-3 px-4 align-middle">
+                                        <span class="px-2.5 py-1 rounded-lg font-mono-code font-bold text-xs {{ $stItem->isLowStock() ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-slate-800 text-white' }}">
+                                            {{ $stItem->stock }} {{ $stItem->unit }}
+                                        </span>
+                                    </td>
+
+                                    <!-- 5. Lokasi Rak -->
+                                    <td class="py-3 px-4 align-middle">
+                                        <span class="font-mono-code text-slate-300 text-[11px]">{{ $stItem->storage_location ?: 'Gudang TOC' }}</span>
+                                    </td>
+
+                                    <!-- 6. Aksi Cepat -->
+                                    <td class="py-3 px-4 align-middle text-right">
+                                        <div class="inline-flex items-center gap-1.5">
+                                            <a href="{{ route('scan.index', ['barcode' => $stItem->barcode]) }}"
+                                               class="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 text-[11px] font-bold transition-all">
+                                                Scan
+                                            </a>
+                                            <a href="{{ route('items.barcode-studio', ['selected_id' => $stItem->id]) }}"
+                                               class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold transition-all">
+                                                Stiker
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-10 text-center text-slate-400">Belum ada barang di database.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            </a>
+
+                <!-- Mobile Card Stream (Khusus Layar HP / MD Hidden) -->
+                <div id="status-mobile-stream" class="md:hidden divide-y divide-slate-800 p-3 space-y-2.5">
+                    @forelse ($statusItems as $stItem)
+                        @php
+                            $stVal = $stItem->availability_status ?: 'sedia';
+                            $searchBlob = strtolower($stItem->name . ' ' . $stItem->barcode . ' ' . $stItem->item_code);
+                        @endphp
+                        <div class="status-table-row p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2"
+                             data-status="{{ $stVal }}"
+                             data-keyword="{{ $searchBlob }}">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-mono-code text-[11px] text-cyan-300 font-bold">{{ $stItem->item_code }}</span>
+                                @if ($stVal === 'sedia')
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-black uppercase">SEDIA</span>
+                                @elseif ($stVal === 'sedang_keluar')
+                                    <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-black uppercase">SEDANG KELUAR</span>
+                                @elseif ($stVal === 'sedang_dipakai')
+                                    <span class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[9px] font-black uppercase">SEDANG DIPAKAI</span>
+                                @else
+                                    <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-black uppercase">SEDANG DIPINJAM</span>
+                                @endif
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                @if ($stItem->photo_url)
+                                    <img src="{{ $stItem->photo_url }}" alt="{{ $stItem->name }}" class="w-11 h-11 rounded-lg object-cover border border-slate-700 shrink-0">
+                                @else
+                                    <div class="w-11 h-11 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                    </div>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-xs font-bold text-white truncate">{{ $stItem->name }}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono-code">{{ $stItem->barcode }}</div>
+                                    <div class="text-[10px] text-slate-300 mt-1 flex items-center justify-between">
+                                        <span>Stok: <strong class="text-white">{{ $stItem->stock }} {{ $stItem->unit }}</strong></span>
+                                        <span>Rak: {{ $stItem->storage_location ?: '-' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-1 flex items-center justify-end gap-2 border-t border-slate-800">
+                                <a href="{{ route('scan.index', ['barcode' => $stItem->barcode]) }}" class="px-3 py-1 rounded-lg bg-emerald-600/40 text-emerald-300 text-[10px] font-bold">Scan In/Out</a>
+                                <a href="{{ route('items.barcode-studio', ['selected_id' => $stItem->id]) }}" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-semibold">Cetak Stiker</a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-6 text-center text-slate-400 text-xs">Belum ada barang di database.</div>
+                    @endforelse
+                </div>
+
+                <!-- Empty State Saat Filter Tidak Menemukan Barang -->
+                <div id="status-empty-state" class="hidden p-8 text-center text-slate-400">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-2 text-cyan-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="text-sm font-bold text-white" id="status-empty-title">Tidak ada barang dengan status ini</div>
+                    <p class="text-xs text-slate-400 mt-1" id="status-empty-desc">Seluruh unit berada dalam kondisi normal.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -594,3 +865,92 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    var currentActiveStatus = 'all';
+
+    function filterStatusTable(status) {
+        currentActiveStatus = status;
+
+        // 1. Update Card Active Rings
+        var cardIds = ['sedia', 'sedang_keluar', 'sedang_dipakai', 'sedang_dipinjam'];
+        cardIds.forEach(function (cid) {
+            var card = document.getElementById('btn-card-' + cid);
+            if (card) {
+                if (status === cid) {
+                    card.classList.add('ring-4', 'ring-cyan-400', 'scale-[1.02]');
+                } else {
+                    card.classList.remove('ring-4', 'ring-cyan-400', 'scale-[1.02]');
+                }
+            }
+        });
+
+        // 2. Update Tab Buttons
+        var tabIds = ['all', 'sedia', 'sedang_keluar', 'sedang_dipakai', 'sedang_dipinjam'];
+        tabIds.forEach(function (tid) {
+            var tab = document.getElementById('tab-status-' + tid);
+            if (tab) {
+                if (status === tid) {
+                    tab.className = 'tab-status-btn px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 shadow-xs';
+                } else {
+                    tab.className = 'tab-status-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800 border border-transparent';
+                }
+            }
+        });
+
+        // 3. Filter Table Rows
+        applyStatusFilterAndSearch();
+    }
+
+    function searchStatusTable(keyword) {
+        applyStatusFilterAndSearch();
+    }
+
+    function applyStatusFilterAndSearch() {
+        var searchInput = document.getElementById('status_table_search');
+        var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        var rows = document.querySelectorAll('.status-table-row');
+        var visibleCount = 0;
+
+        rows.forEach(function (row) {
+            var rowStatus = row.getAttribute('data-status') || 'sedia';
+            var rowKeyword = row.getAttribute('data-keyword') || '';
+
+            var matchStatus = (currentActiveStatus === 'all' || rowStatus === currentActiveStatus);
+            var matchSearch = (!query || rowKeyword.indexOf(query) !== -1);
+
+            if (matchStatus && matchSearch) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        var emptyBox = document.getElementById('status-empty-state');
+        if (emptyBox) {
+            if (visibleCount === 0) {
+                emptyBox.classList.remove('hidden');
+                var title = document.getElementById('status-empty-title');
+                var desc = document.getElementById('status-empty-desc');
+                if (currentActiveStatus !== 'all') {
+                    var statusLabels = {
+                        'sedia': 'Sedia di Gudang',
+                        'sedang_keluar': 'Sedang Keluar',
+                        'sedang_dipakai': 'Sedang Dipakai',
+                        'sedang_dipinjam': 'Sedang Dipinjam'
+                    };
+                    if (title) title.textContent = 'Tidak Ada Barang Berstatus "' + (statusLabels[currentActiveStatus] || currentActiveStatus) + '"';
+                    if (desc) desc.textContent = 'Saat ini belum ada unit logistik yang terdaftar dalam status ini.';
+                } else {
+                    if (title) title.textContent = 'Tidak Ada Barang yang Cocok';
+                    if (desc) desc.textContent = 'Coba kata kunci pencarian yang lain.';
+                }
+            } else {
+                emptyBox.classList.add('hidden');
+            }
+        }
+    }
+</script>
+@endpush

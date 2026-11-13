@@ -62,13 +62,18 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
+        $statusItems = Item::with(['category', 'creator'])
+            ->orderBy('name')
+            ->get();
+
         return view('dashboard.index', compact(
             'stats',
             'categoryStats',
             'recentMovements',
             'lowStockItems',
             'recentItems',
-            'recentAccessLogs'
+            'recentAccessLogs',
+            'statusItems'
         ));
     }
 }
