@@ -316,9 +316,43 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   3. **4 Status Ketersediaan Barang (`Sedia`, `Sedang Keluar`, `Sedang Dipakai`, `Sedang Dipinjam`):** Ditambahkan pada tabel `items` (`availability_status`) lengkap dengan badge warna, filter pencarian, dan pilihan status pada form Tambah/Edit Barang.
   4. **Sinkronisasi Otomatis Status Barang di Dashboard & Menu BAST/BAP:** Panel 4 Kartu Status Ketersediaan Barang tampil sinkron secara real-time di **Dashboard** (`/dashboard`) dan **BAST & BAP** (`/handovers`), serta otomatis berubah saat BAST/BAP atau Scan Masuk/Keluar diterbitkan.
   5. **Format Pinjam Pakai (BAST & BAP) Lebih Rinci & Resmi:** Penambahan atribut Jenis Peruntukan (`Pinjam Pakai`, `Operasional Khusus`, `Inventaris Unit`, `Distribusi`), Keperluan/Nama Operasi, Nomor Surat Perintah (Sprin)/Referensi, Lokasi Penggunaan, Batas Waktu Pengembalian, Nomor Seri (S/N) & Kelengkapan Aksesoris per barang, 5 Pasal Ketentuan & Kewajiban Pinjam Pakai standar kedinasan, serta kolom Pejabat Mengetahui/Menyetujui (Atasan/Ka Unit) pada form dan cetakan PDF resmi.
-- **2026-11-13 (Perbaikan Pemindai Kamera HP di Jaringan Wi-Fi LAN HTTP):**
-  1. **Pemindai Kamera Native HP (`capture="environment"`):** Menambahkan tombol **"Foto Barcode"** di Terminal Scan yang langsung memanggil kamera bawaan HP untuk menjepret stiker barcode dan mengekstrak kode secara instan via `Html5Qrcode.scanFile()` tanpa terpengaruh batasan keamanan HTTP browser HP.
-  2. **Modal Edukasi & Pengaktifan Live Stream Video:** Menggantikan alert error kaku browser dengan modal elegan `#modal-camera-http-guide` yang menyediakan tombol jepret foto langsung serta panduan 15 detik mengaktifkan flag `chrome://flags` (`Insecure origins treated as secure`) untuk live video streaming di Google Chrome Android.
-- **2026-11-13 (Fitur Langsung Scan & Redesain Mobile Bottom Nav Sesuai Referensi Gambar):**
-  1. **Redesain 5 Tombol Bilah Navigasi Bawah Mobile:** Menyesuaikan tata letak bilah navigasi mobile dengan 5 tombol presisi: `Beranda` (grid), `Barang` (kubus 3D), **`SCAN`** (tombol bulat melayang di tengah berefek neon glow cyan-emerald), `Mutasi` (panah bolak-balik mutasi scan keluar/masuk), dan `Profil` (akun petugas).
-  2. **Fitur "Langsung Scan" Cepat (Direct Viewfinder Camera Trigger):** Menekan tombol tengah `SCAN` dari halaman manapun langsung mengarahkan ke pemindai dan seketika menyalakan kamera live stream di dalam kotak "Pemindai Kamera & Laser Scanner" (`?autostart=camera`), atau langsung mengaktifkan kamera pemindai jika sudah berada di halaman scan tanpa membuka dialog file picker eksternal.
+- **2026-11-13 (Revisi Ikon Navigasi Menu Sesuai Fungsi Riil):**
+  Pembaruan menyeluruh pada 8 ikon navigasi bilah samping (*app-sidebar*) dan laci navigasi ponsel (*mobile-drawer*) menjadi representasi visual SVG presisi tinggi (*high-fidelity functional icons*):
+  1. `[01] Dashboard Analitik`: Ikon kuadran panel HUD analitik (menggantikan ikon rumah/home biasa).
+  2. `[02] Scan Barcode (In/Out)`: Ikon sudut bidik laser scanner kamera (*laser viewfinder*) dengan pola barcode in/out.
+  3. `[03] Data Barang & Gudang`: Ikon paket inventaris logistik & rak master barang berlakban dan berlabel.
+  4. `[04] Studio Pembuat Barcode`: Ikon mesin pencetak label barcode (*label printer*) yang sedang mencetak stiker bergaris barcode siap pakai.
+  5. `[05] Berita Acara (BAST & BAP)`: Ikon map dokumen dinas (*handover clipboard*) berklip dengan centang verifikasi dan pena tanda tangan.
+  6. `[06] Laporan Keluar & Masuk`: Ikon grafik batang analitik mutasi arus keluar-masuk dengan panah tren.
+  7. `[07] History Akses Web`: Ikon perisai keamanan (*security shield*) berpadu dengan jarum audit waktu login/logout.
+  8. `[08] Setingan Profil & User`: Ikon identitas operator bertim (*user & team access control*).
+  9. Penyertaan ikon dan label terstruktur pada laci navigasi ponsel (*Mobile Drawer*) yang sebelumnya belum berikon.
+- **2026-11-13 (Revisi Pewarnaan Ikon Navigasi Menu - Vibrant Color-Coded Icons):**
+  Penerapan palet warna berkarakter dan wadah mikro ikon berpendar (*glow container*) untuk setiap menu navigasi di Desktop Sidebar (`app-sidebar`), Mobile Drawer, dan Mobile Bottom Navbar:
+  1. `[01] Dashboard Analitik`: **Cyan Neon** (`#22D3EE` / `bg-cyan-500/15`, `border-cyan-400/30`, `text-cyan-400`).
+  2. `[02] Scan Barcode (In/Out)`: **Emerald Neon** (`#34D399` / `bg-emerald-500/15`, `border-emerald-400/30`, `text-emerald-400`).
+  3. `[03] Data Barang & Gudang`: **Amber Gold** (`#FBBF24` / `bg-amber-500/15`, `border-amber-400/30`, `text-amber-400`).
+  4. `[04] Studio Pembuat Barcode`: **Purple Violet** (`#A78BFA` / `bg-purple-500/15`, `border-purple-400/30`, `text-purple-400`).
+  5. `[05] Berita Acara (BAST & BAP)`: **Sky Blue** (`#38BDF8` / `bg-sky-500/15`, `border-sky-400/30`, `text-sky-400`).
+  6. `[06] Laporan Keluar & Masuk`: **Teal Mint** (`#2DD4BF` / `bg-teal-500/15`, `border-teal-400/30`, `text-teal-400`).
+  7. `[07] History Akses Web`: **Rose Neon** (`#FB7185` / `bg-rose-500/15`, `border-rose-400/30`, `text-rose-400`).
+  8. `[08] Setingan Profil & User`: **Fuchsia Pink** (`#E879F9` / `bg-fuchsia-500/15`, `border-fuchsia-400/30`, `text-fuchsia-400`).
+  9. Efek interaktif *hover scale 110%* dengan pendar neon yang halus dan estetika Anti-AI berkelas tinggi.
+- **2026-11-13 (Revisi Tata Letak Khusus Mobile HP vs Komputer PC — Adaptive Dual-View Experience):**
+  Penyempurnaan arsitektur antarmuka adaptif dual-view untuk membedakan secara tegas pengalaman penggunaan di layar komputer (PC/Desktop) dan layar ponsel (HP/Smartphone):
+  1. **Bilah Navigasi Bawah Khusus HP (Floating Mobile App Dock):** Dock bawah mengambang dengan latar kaca blur (*glassmorphism*), 4 tombol jempol berwarna, dan tombol tengah melingkar menonjol (*Floating Action Button / FAB*) untuk **SCAN BARCODE** berpendar neon emerald.
+  2. **Header Mobile TOC Pintar:** Header mobile menampilkan emblem resmi bulat **TOC Gegana**, judul teks dinas, dan pill waktu mundur sesi aktif 15 menit (`#session-countdown-mobile`) yang sinkron dengan desktop.
+  3. **Halaman Data Barang (`/items`) Dual Mode:** Tabel lebar multi-kolom tetap aktif untuk desktop (`hidden md:block`), sedangkan di ponsel (`md:hidden`) berganti otomatis menjadi **Kartu Cerdas Barang Mobile (Smart Mobile Cards)** dengan foto barang (dukungan Lightbox modal), badge status ketersediaan, SVG barcode, dan 3 tombol aksi cepat sentuh jempol (Scan, Stiker, Ubah).
+  4. **Halaman Dashboard (`/dashboard`) Mobile Stream:** Tombol aksi hero adaptif 2x2 pada HP, dan riwayat mutasi scan serta registrasi barang terbaru berubah menjadi kartu alur mobile vertikal yang ringkas tanpa scroll horizontal.
+  5. **Terminal Scan Barcode (`/scan`) Touch Stepper:** Tombol penyesuaian kuantiti cepat ramah jempol (`-1`, input, `+1`, `+5`, `+10`) dan riwayat scan mobile card stream.
+  6. **Form Berita Acara BAST & BAP (`/handovers`):** Signature Pad digital dengan kontrol sentuh `touch-action: none` dan galeri upload multi-foto bukti dokumentasi adaptif.
+- **2026-11-13 (Perbaikan Tata Letak Desktop PC — Normalisasi Tag Layout):**
+  Mengeliminasi 8 baris duplikasi tag tombol drawer dan penutup header (`</div></header>`) pada `resources/views/layouts/app.blade.php`. Memulihkan hierarki pembungkus utama `<div class="flex-1 lg:pl-[272px] ...">` sehingga seluruh konten halaman (`<main>`) pada layar PC/Komputer kembali terbentang proporsional 100% dan tidak lagi tergencet di sisi kanan.
+- **2026-11-13 (Fitur Auto-Start Kamera Pemindai pada Tombol SCAN):**
+  Penerapan aktivasi kamera instan saat menekan tombol **SCAN** (Floating Action Button di navigasi bawah ponsel maupun tombol Scan di header):
+  1. Tombol SCAN mengarahkan ke `/scan?camera=1` dengan pendeteksi otomatis pada `DOMContentLoaded` yang langsung menginisialisasi kamera belakang ponsel (`environment facingMode`).
+  2. Handler in-page: Jika pengguna telah berada di halaman `/scan`, menekan tombol SCAN bawah langsung menyalakan/memfokuskan kamera tanpa me-reload halaman.
+  3. Layar secara otomatis melakukan *smooth-scroll* ke jendela bidik kamera saat kamera aktif sehingga petugas gudang dapat langsung mengarahkan perangkat ke barcode fisik.
+  4. Penyediaan penanganan error ramah (*graceful fallback*) dan polling kesiapan pustaka `Html5Qrcode`.
+- **2026-11-13 (Penyempurnaan Navigasi Sidebar & Drawer - Clean Minimalist HUD):**
+  Menghilangkan nomor indeks kurung siku `[01]`..`[08]` dan simbol garis miring ganda `//` pada seksi menu di Sidebar Desktop dan Mobile Drawer. Tampilan menjadi jauh lebih bersih, modern, dan memberikan ruang horizontal yang lebih lapang bagi label menu dan ikon berwarna.

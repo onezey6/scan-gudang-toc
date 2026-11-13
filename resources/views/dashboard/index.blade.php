@@ -23,31 +23,31 @@
                 </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2.5">
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5">
                 <a href="{{ route('scan.index', ['mode' => 'in']) }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/50 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/50 transition-all">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
-                    <span>Scan Barang Masuk</span>
+                    <span>Scan Masuk</span>
                 </a>
                 <a href="{{ route('scan.index', ['mode' => 'out']) }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-950/30 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-950/30 transition-all">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
-                    <span>Scan Barang Keluar</span>
+                    <span>Scan Keluar</span>
                 </a>
                 <a href="{{ route('items.barcode-studio') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur transition-all">
-                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur transition-all">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h2v12H4V6zm4 0h1v12H8V6zm3 0h3v12h-3V6zm5 0h1v12h-1V6zm3 0h1v12h-1V6z"/>
                     </svg>
                     <span>Studio Barcode</span>
                 </a>
                 <a href="{{ route('handovers.create', ['type' => 'bast']) }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur transition-all">
-                    <svg class="w-4 h-4 text-teal-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur transition-all">
+                    <svg class="w-4 h-4 text-teal-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                     <span>Buat BAST/BAP</span>
@@ -281,7 +281,7 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse table-fluid">
                         <thead>
                             <tr class="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -351,6 +351,45 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- TAMPILAN AKTIVITAS SCAN KHUSUS HP (MD HIDDEN) -->
+                <div class="md:hidden divide-y divide-slate-100 p-3 space-y-2.5">
+                    @forelse ($recentMovements as $m)
+                        <div class="card-elevated bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs space-y-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-mono-code font-bold text-[11px] text-slate-800">{{ $m->reference_no }}</span>
+                                @if ($m->movement_type === 'in')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
+                                        MASUK +{{ $m->quantity }} {{ $m->item?->unit }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">
+                                        KELUAR -{{ $m->quantity }} {{ $m->item?->unit }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-start gap-2.5">
+                                @if ($m->item?->photo_url)
+                                    <button type="button" onclick="openPhotoLightbox('{{ $m->item->photo_url }}', '{{ addslashes($m->item->name) }}')"
+                                            class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                                        <img src="{{ $m->item->photo_url }}" alt="{{ $m->item->name }}" class="w-full h-full object-cover">
+                                    </button>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-bold text-slate-900 text-xs truncate">{{ $m->item?->name ?? 'Barang Dihapus' }}</div>
+                                    <div class="text-[11px] text-emerald-700 font-mono-code">Barcode: {{ $m->item?->barcode ?? '-' }}</div>
+                                    <div class="text-[10px] text-slate-500 mt-1 flex items-center justify-between">
+                                        <span>Stok: {{ $m->stock_before }} &rarr; <strong class="text-slate-800">{{ $m->stock_after }}</strong></span>
+                                        <span>Petugas: <strong class="text-slate-700">{{ $m->user?->name ?? 'Sistem' }}</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-6 text-center text-xs text-slate-400">Belum ada riwayat scan barcode.</div>
+                    @endforelse
+                </div>
             </div>
 
             <!-- Recently Added Items with Creator Tracking -->
@@ -365,7 +404,7 @@
                     </a>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="hidden md:block overflow-x-auto">
                     <table class="w-full text-left border-collapse table-fluid">
                         <thead>
                             <tr class="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -427,6 +466,33 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <!-- TAMPILAN BARANG TERBARU KHUSUS HP (MD HIDDEN) -->
+                <div class="md:hidden divide-y divide-slate-100 p-3 space-y-2.5">
+                    @foreach ($recentItems as $item)
+                        <div class="card-elevated bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                @if ($item->photo_url)
+                                    <button type="button" onclick="openPhotoLightbox('{{ $item->photo_url }}', '{{ addslashes($item->name) }}')"
+                                            class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                                        <img src="{{ $item->photo_url }}" alt="{{ $item->name }}" class="w-full h-full object-cover">
+                                    </button>
+                                @endif
+                                <div class="min-w-0">
+                                    <div class="font-bold text-slate-900 text-xs truncate">{{ $item->name }}</div>
+                                    <div class="text-[10px] font-mono-code text-emerald-700">{{ $item->item_code }}</div>
+                                    <div class="text-[10px] text-slate-400">Rak: {{ $item->storage_location ?: 'Gudang' }}</div>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="text-sm font-extrabold text-slate-900">{{ number_format($item->stock) }} <span class="text-[10px] text-slate-400">{{ $item->unit }}</span></div>
+                                <div class="keep-light bg-white px-1 py-0.5 rounded border border-slate-200 mt-1">
+                                    <svg class="js-barcode max-w-[85px] h-auto block" data-barcode="{{ $item->barcode }}" data-height="16" data-width="0.8" data-fontsize="8" data-margin="1"></svg>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
