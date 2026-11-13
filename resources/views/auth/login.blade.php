@@ -11,14 +11,61 @@
     <style>
         body {
             font-family: 'JetBrains Mono', monospace;
-            background-color: #040c10;
-            background-image:
-                linear-gradient(to bottom, rgba(4, 12, 16, 0.50) 0%, rgba(4, 12, 16, 0.30) 40%, rgba(4, 12, 16, 0.75) 100%),
-                url('{{ asset('images/bg-login.jpg') }}');
-            background-size: cover;
-            background-position: center bottom;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+            background-color: #03080e;
+        }
+
+        /* Gerakan Mengambang Kamera Ruang Siber (Cinematic 3D Cyber Float) */
+        @keyframes cyberPanMotion {
+            0% {
+                transform: scale(1.05) translate(0px, 0px);
+            }
+            25% {
+                transform: scale(1.09) translate(-14px, -10px);
+            }
+            50% {
+                transform: scale(1.13) translate(12px, -18px);
+            }
+            75% {
+                transform: scale(1.08) translate(-8px, -6px);
+            }
+            100% {
+                transform: scale(1.05) translate(0px, 0px);
+            }
+        }
+
+        .cyber-bg-motion {
+            animation: cyberPanMotion 28s ease-in-out infinite alternate;
+            will-change: transform;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        /* Sapuan Sinar Laser Grid Horizon */
+        @keyframes gridLaserSweep {
+            0% {
+                top: 100%;
+                opacity: 0;
+            }
+            25% {
+                opacity: 0.65;
+            }
+            75% {
+                opacity: 0.65;
+            }
+            100% {
+                top: 48%;
+                opacity: 0;
+            }
+        }
+
+        .laser-sweep-beam {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 5%, rgba(34, 211, 238, 0.25) 20%, #22d3ee 50%, #38bdf8 65%, rgba(34, 211, 238, 0.25) 80%, transparent 95%);
+            box-shadow: 0 0 16px 2px rgba(34, 211, 238, 0.75);
+            animation: gridLaserSweep 8s ease-in-out infinite;
         }
 
         .toc-card {
@@ -113,11 +160,28 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between text-slate-200 relative overflow-x-hidden select-none">
+<body class="min-h-screen flex flex-col justify-between text-slate-200 relative overflow-x-hidden select-none bg-[#03080e]">
 
-    <!-- Ambient Center Glow -->
-    <div class="pointer-events-none fixed inset-0 flex items-center justify-center">
-        <div class="w-[520px] h-[520px] rounded-full bg-teal-500/10 blur-[110px]"></div>
+    <!-- LAYER BACKGROUND CYBERSPACE BERGERAK & HIDUP -->
+    <div class="pointer-events-none fixed inset-0 overflow-hidden z-0">
+        <!-- 1. Motion Image Layer (Gerakan Mengambang Kamera Ruang Siber) -->
+        <div class="cyber-bg-motion absolute -inset-[8%] bg-cover bg-bottom bg-no-repeat"
+             style="background-image: url('{{ asset('images/bg-login.jpg') }}');"></div>
+
+        <!-- 2. Dark Cyber Vignette & Floor Horizon Shadow -->
+        <div class="absolute inset-0 bg-gradient-to-b from-[#03080e]/60 via-[#03080e]/25 to-[#03080e]/85"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#03080e_90%)]"></div>
+
+        <!-- 3. Sinar Laser Pemindai Grid Horizon -->
+        <div class="laser-sweep-beam"></div>
+
+        <!-- 4. Canvas Partikel Digital Melayang (Twinkling Floating Dust) -->
+        <canvas id="cyber-particles-canvas" class="absolute inset-0 w-full h-full"></canvas>
+
+        <!-- 5. Ambient Center Cyan Glow -->
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-[580px] h-[580px] rounded-full bg-cyan-500/10 blur-[130px]"></div>
+        </div>
     </div>
 
     <!-- Top Spacer -->
@@ -271,6 +335,79 @@
                 eyeClosed.classList.add('hidden');
             }
         }
+
+        // Partikel Cahaya Digital Melayang (Twinkling Floating Cyber Stardust)
+        (function initCyberParticles() {
+            var canvas = document.getElementById('cyber-particles-canvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
+            var particles = [];
+            var maxParticles = 46;
+            var width, height;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize, { passive: true });
+            resize();
+
+            function createParticle(fromBottom) {
+                return {
+                    x: Math.random() * width,
+                    y: fromBottom ? height + Math.random() * 25 : Math.random() * height,
+                    radius: Math.random() * 1.6 + 0.6,
+                    vx: (Math.random() - 0.5) * 0.35,
+                    vy: -(Math.random() * 0.55 + 0.22),
+                    alpha: Math.random() * 0.5 + 0.25,
+                    pulseSpeed: Math.random() * 0.02 + 0.008,
+                    color: Math.random() > 0.4 ? 'rgba(34, 211, 238, ' : 'rgba(56, 189, 248, '
+                };
+            }
+
+            for (var i = 0; i < maxParticles; i++) {
+                particles.push(createParticle(false));
+            }
+
+            var animId;
+            function render() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha += Math.sin(Date.now() * p.pulseSpeed) * 0.008;
+
+                    if (p.alpha < 0.15) p.alpha = 0.15;
+                    if (p.alpha > 0.85) p.alpha = 0.85;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color + p.alpha + ')';
+                    ctx.shadowColor = '#22d3ee';
+                    ctx.shadowBlur = p.radius * 3.5;
+                    ctx.fill();
+
+                    // Reset jika partikel keluar layar
+                    if (p.y < -10 || p.x < -10 || p.x > width + 10) {
+                        particles[i] = createParticle(true);
+                    }
+                }
+
+                animId = requestAnimationFrame(render);
+            }
+
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) {
+                    cancelAnimationFrame(animId);
+                } else {
+                    animId = requestAnimationFrame(render);
+                }
+            });
+
+            render();
+        })();
     </script>
 </body>
 </html>

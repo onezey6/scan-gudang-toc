@@ -379,3 +379,8 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   2. **Kompresi Otomatis Foto HD di Sisi Browser (Client-Side Smart HD Image Compression):** Mengimplementasikan `compressImageFile(file, 1600, 0.82)` berbasis HTML5 `<canvas>` dan `DataTransfer` pada `resources/views/handovers/create.blade.php` dan `resources/views/handovers/show.blade.php` sehingga foto kamera beresolusi besar (5–15 MB per foto) otomatis diringankan menjadi ~150–300 KB HD begitu dipilih, lengkap dengan indikator total ukuran MB yang siap diunggah.
 - **2026-11-13 (Penerapan Background Cyberspace Grid Futuristik pada Halaman Login):**
   Memasang gambar pemandangan ruang siber digital (`public/images/bg-login.jpg`) sebagai latar belakang penuh halaman Login (`/login`) dengan mode *cover*, *fixed center-bottom*, perpaduan lapisan gelap transparan untuk kontras maksimal, serta efek kartu kaca semi-transparan (*glassmorphism*) yang menyatu secara estetik dengan pendar lantai grid neon biru.
+- **2026-11-13 (Animasi Dinamis Background Bergerak, Partikel Melayang & Laser Grid di Halaman Login):**
+  Mengimplementasikan efek latar belakang bergerak (*living dynamic cyberspace motion*):
+  1. **Cinematic Cyber Float:** Animasi kamera melayang perlahan (*smooth ambient pan & zoom* 28s) pada layer gambar latar `cyber-bg-motion` dengan akselerasi perangkat keras 60 FPS.
+  2. **Floating Cyber Stardust:** Mesin partikel canvas HTML5 ringan (~46 partikel bintik neon cyan dan sky blue) yang melayang ke atas dengan efek kedip (*twinkling pulses*) alami.
+  3. **Holographic Grid Scan Beam:** Sapuan garis laser neon cyan yang bergerak lembut di atas permukaan lantai grid untuk mempertegas kedalaman 3D ruangan digital.
