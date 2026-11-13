@@ -75,6 +75,7 @@ QUEUE_CONNECTION=database
 EOF
 
 # 7. Install Dependency PHP via Composer
+export COMPOSER_ALLOW_SUPERUSER=1
 composer install --no-dev --optimize-autoloader --no-interaction
 
 # 8. Restore Database Lengkap
