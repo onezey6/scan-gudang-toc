@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class AccessLog extends Model
 {
@@ -65,21 +66,28 @@ class AccessLog extends Model
         $lng = $req?->input('longitude');
         $locationName = $req?->input('location_name');
 
-        return self::create([
+        $data = [
             'user_id' => $user?->id,
             'user_name' => $user?->name ?? ($attemptedLogin ?: 'Tamu / Tidak Dikenal'),
             'user_email' => $user?->email ?? $attemptedLogin,
             'user_role' => $user?->role ?? '-',
             'event_type' => $eventType,
             'ip_address' => $req?->ip() ?? '127.0.0.1',
-            'latitude' => is_numeric($lat) ? (float) $lat : null,
-            'longitude' => is_numeric($lng) ? (float) $lng : null,
-            'location_name' => $locationName,
             'device_browser' => self::parseUserAgent($ua),
             'user_agent' => $ua,
             'description' => $description,
             'accessed_at' => now(),
-        ]);
+        ];
+
+        try {
+            if (Schema::hasColumn('access_logs', 'latitude')) {
+                $data['latitude'] = is_numeric($lat) ? (float) $lat : null;
+                $data['longitude'] = is_numeric($lng) ? (float) $lng : null;
+                $data['location_name'] = $locationName;
+            }
+        } catch (\Throwable) {}
+
+        return self::create($data);
     }
 
     public static function parseUserAgent(string $ua): string
