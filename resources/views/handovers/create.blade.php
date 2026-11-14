@@ -272,14 +272,31 @@
                         @if ($selectedBast && $selectedBast->items->count() > 0)
                             @foreach ($selectedBast->items as $idx => $bItem)
                                 <tr class="handover-item-row">
-                                    <td class="py-2.5 px-2.5">
-                                        <select name="items[{{ $idx }}][item_id]" required class="w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs bg-white">
-                                            @foreach ($items as $it)
-                                                <option value="{{ $it->id }}" data-barcode="{{ $it->barcode }}" {{ $it->id === $bItem->item_id ? 'selected' : '' }}>
-                                                    [{{ $it->barcode }}] {{ $it->name }} ({{ $it->stock }} {{ $it->unit }} • {{ $it->availability_label }})
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                    <td class="py-2.5 px-2.5 min-w-[280px]">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-12 h-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-900/40 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group relative cursor-pointer"
+                                                 onclick="zoomRowItemPhoto(this)" title="Klik untuk perbesar foto barang">
+                                                <img class="row-item-thumb-img w-full h-full object-cover hidden" src="" alt="Foto Barang">
+                                                <div class="row-item-thumb-empty text-slate-400 flex flex-col items-center justify-center text-[9px] font-bold">
+                                                    <svg class="w-4 h-4 opacity-50 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    <span>FOTO</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <select name="items[{{ $idx }}][item_id]" required onchange="updateRowItemPreview(this)" class="row-item-select w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs bg-white">
+                                                    @foreach ($items as $it)
+                                                        <option value="{{ $it->id }}" data-barcode="{{ $it->barcode }}" {{ $it->id === $bItem->item_id ? 'selected' : '' }}>
+                                                            [{{ $it->barcode }}] {{ $it->name }} ({{ $it->stock }} {{ $it->unit }} • {{ $it->availability_label }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="row-item-info text-[10px] text-slate-400 mt-1 truncate">
+                                                    Pilih barang untuk melihat foto & lokasi
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td class="py-2.5 px-2.5">
                                         <input type="number" name="items[{{ $idx }}][quantity]" value="{{ $bItem->quantity }}" min="1" required
@@ -322,14 +339,32 @@
                             @endforeach
                         @else
                             <tr class="handover-item-row">
-                                <td class="py-2.5 px-2.5">
-                                    <select name="items[0][item_id]" required class="w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs bg-white">
-                                        @foreach ($items as $it)
-                                            <option value="{{ $it->id }}" data-barcode="{{ $it->barcode }}">
-                                                [{{ $it->barcode }}] {{ $it->name }} ({{ $it->stock }} {{ $it->unit }} • {{ $it->availability_label }})
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <td class="py-2.5 px-2.5 min-w-[280px]">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-12 h-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-900/40 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group relative cursor-pointer"
+                                             onclick="zoomRowItemPhoto(this)" title="Klik untuk perbesar foto barang">
+                                            <img class="row-item-thumb-img w-full h-full object-cover hidden" src="" alt="Foto Barang">
+                                            <div class="row-item-thumb-empty text-slate-400 flex flex-col items-center justify-center text-[9px] font-bold">
+                                                <svg class="w-4 h-4 opacity-50 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                                <span>FOTO</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <select name="items[0][item_id]" required onchange="updateRowItemPreview(this)" class="row-item-select w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs bg-white">
+                                                <option value="" disabled selected>-- Pilih Barang Gudang --</option>
+                                                @foreach ($items as $it)
+                                                    <option value="{{ $it->id }}" data-barcode="{{ $it->barcode }}">
+                                                        [{{ $it->barcode }}] {{ $it->name }} ({{ $it->stock }} {{ $it->unit }} • {{ $it->availability_label }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="row-item-info text-[10px] text-slate-400 mt-1 truncate">
+                                                Pilih barang untuk melihat foto & lokasi
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="py-2.5 px-2.5">
                                     <input type="number" name="items[0][quantity]" value="1" min="1" required
@@ -496,6 +531,9 @@
             'stock' => $i->stock,
             'unit' => $i->unit,
             'availability_label' => $i->availability_label,
+            'photo_url' => $i->photo_url,
+            'brand' => $i->brand,
+            'storage_location' => $i->storage_location,
         ];
     })->values();
 @endphp
@@ -509,6 +547,70 @@
         document.querySelectorAll('.row-availability-select').forEach(function (sel) {
             sel.value = val;
         });
+    }
+
+    function updateRowItemPreview(selectEl) {
+        if (!selectEl) return;
+        var row = selectEl.closest('.handover-item-row');
+        if (!row) return;
+
+        var thumbImg = row.querySelector('.row-item-thumb-img');
+        var thumbEmpty = row.querySelector('.row-item-thumb-empty');
+        var infoEl = row.querySelector('.row-item-info');
+
+        var itemId = selectEl.value;
+        var item = itemsCatalog.find(function (it) {
+            return parseInt(it.id, 10) === parseInt(itemId, 10);
+        });
+
+        if (item) {
+            if (item.photo_url) {
+                if (thumbImg) {
+                    thumbImg.src = item.photo_url;
+                    thumbImg.classList.remove('hidden');
+                }
+                if (thumbEmpty) thumbEmpty.classList.add('hidden');
+            } else {
+                if (thumbImg) {
+                    thumbImg.src = '';
+                    thumbImg.classList.add('hidden');
+                }
+                if (thumbEmpty) thumbEmpty.classList.remove('hidden');
+            }
+
+            if (infoEl) {
+                var brandText = item.brand ? ('Merk: ' + item.brand) : 'Merk: -';
+                var locText = item.storage_location ? ('Lokasi: ' + item.storage_location) : 'Lokasi: Gudang';
+                var stockText = 'Stok: ' + item.stock + ' ' + (item.unit || 'Unit');
+                infoEl.innerHTML = '<span class="font-bold text-emerald-600 dark:text-emerald-400">' + stockText + '</span> • <span class="text-slate-600 dark:text-slate-400">' + brandText + '</span> • <span class="text-slate-500">' + locText + '</span>';
+            }
+        } else {
+            if (thumbImg) {
+                thumbImg.src = '';
+                thumbImg.classList.add('hidden');
+            }
+            if (thumbEmpty) thumbEmpty.classList.remove('hidden');
+            if (infoEl) {
+                infoEl.textContent = 'Pilih barang untuk melihat foto & lokasi';
+            }
+        }
+    }
+
+    function zoomRowItemPhoto(thumbBox) {
+        var img = thumbBox ? thumbBox.querySelector('.row-item-thumb-img') : null;
+        if (img && img.src && !img.classList.contains('hidden')) {
+            var row = thumbBox.closest('.handover-item-row');
+            var select = row ? row.querySelector('.row-item-select') : null;
+            var title = 'Foto Barang Logistik';
+            if (select && select.selectedIndex >= 0 && select.options[select.selectedIndex]) {
+                title = select.options[select.selectedIndex].text;
+            }
+            if (typeof openPhotoLightbox === 'function') {
+                openPhotoLightbox(img.src, title);
+            } else {
+                window.open(img.src, '_blank');
+            }
+        }
     }
 
     function addHandoverItemRow(selectedItemId) {
@@ -526,8 +628,28 @@
             optionsHtml += '<option value="' + it.id + '" ' + sel + '>[' + it.barcode + '] ' + it.name + ' (' + it.stock + ' ' + it.unit + ' • ' + it.availability_label + ')</option>';
         });
 
+        var col0Html =
+            '<div class="flex items-center gap-2.5">' +
+                '<div class="w-12 h-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-900/40 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group relative cursor-pointer" onclick="zoomRowItemPhoto(this)" title="Klik untuk perbesar foto barang">' +
+                    '<img class="row-item-thumb-img w-full h-full object-cover hidden" src="" alt="Foto Barang">' +
+                    '<div class="row-item-thumb-empty text-slate-400 flex flex-col items-center justify-center text-[9px] font-bold">' +
+                        '<svg class="w-4 h-4 opacity-50 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>' +
+                        '</svg>' +
+                        '<span>FOTO</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="flex-1 min-w-0">' +
+                    '<select name="items[' + rowCounter + '][item_id]" required onchange="updateRowItemPreview(this)" class="row-item-select w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs bg-white">' +
+                        '<option value="" disabled ' + (!selectedItemId ? 'selected' : '') + '>-- Pilih Barang Gudang --</option>' +
+                        optionsHtml +
+                    '</select>' +
+                    '<div class="row-item-info text-[10px] text-slate-400 mt-1 truncate">Pilih barang untuk melihat foto & lokasi</div>' +
+                '</div>' +
+            '</div>';
+
         tr.innerHTML =
-            '<td class="py-2.5 px-2.5"><select name="items[' + rowCounter + '][item_id]" required class="w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs bg-white">' + optionsHtml + '</select></td>' +
+            '<td class="py-2.5 px-2.5 min-w-[280px]">' + col0Html + '</td>' +
             '<td class="py-2.5 px-2.5"><input type="number" name="items[' + rowCounter + '][quantity]" value="1" min="1" required class="w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs font-bold"></td>' +
             '<td class="py-2.5 px-2.5"><input type="text" name="items[' + rowCounter + '][serial_number]" placeholder="S/N / No. Reg..." class="w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs font-mono-code"></td>' +
             '<td class="py-2.5 px-2.5"><input type="text" name="items[' + rowCounter + '][accessories]" placeholder="Baterai, charger, antena..." class="w-full px-2.5 py-2 rounded-xl border border-slate-300 text-xs"></td>' +
@@ -542,6 +664,11 @@
             '<td class="py-2.5 px-2 text-center"><button type="button" onclick="removeHandoverRow(this)" class="text-rose-600 hover:text-rose-800 font-bold text-sm">&times;</button></td>';
 
         tbody.appendChild(tr);
+
+        var newSelect = tr.querySelector('.row-item-select');
+        if (newSelect) {
+            updateRowItemPreview(newSelect);
+        }
     }
 
     function removeHandoverRow(btn) {
@@ -752,6 +879,11 @@
     document.addEventListener('DOMContentLoaded', function () {
         initSignaturePad('canvas_sig_1');
         initSignaturePad('canvas_sig_2');
+
+        // Inisialisasi preview foto barang untuk baris yang sudah ada
+        document.querySelectorAll('.row-item-select').forEach(function (sel) {
+            updateRowItemPreview(sel);
+        });
 
         var quickInput = document.getElementById('quick_barcode_handover');
         if (quickInput) {
