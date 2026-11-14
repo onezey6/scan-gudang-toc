@@ -444,4 +444,82 @@ class LogisticsFlowTest extends TestCase
             'deleted_at' => null,
         ]);
     }
+
+    public function test_pwa_manifest_and_service_worker_exist(): void
+    {
+        $this->get('/manifest.json')
+            ->assertStatus(200)
+            ->assertJsonFragment(['short_name' => 'LOGISTIK.TOC']);
+
+        $this->assertFileExists(public_path('sw.js'));
+    }
+
+    public function test_admin_can_download_database_backup_and_staff_is_denied(): void
+    {
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+
+        $res = $this->get(route('settings.backup-db'));
+        $res->assertStatus(200);
+        $res->assertHeader('Content-Type', 'application/sql; charset=utf-8');
+
+        // Staff non-admin should get 403
+        $staff = User::where('role', 'staff')->first();
+        if ($staff) {
+            $this->actingAs($staff);
+            $this->get(route('settings.backup-db'))->assertStatus(403);
+        }
+    }
+
+    public function test_item_stock_card_renders_with_movements(): void
+    {
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+
+        $item = Item::withTrashed()->firstOrFail();
+        if ($item->trashed()) {
+            $item->restore();
+        }
+
+        $res = $this->get(route('items.stock-card', $item));
+        $res->assertStatus(200);
+        $res->assertSee('KARTU KENDALI PERPUTARAN STOK BARANG');
+        $res->assertSee($item->barcode);
+    }
+
+    public function test_overdue_bast_calculation_and_dashboard_alert(): void
+    {
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+
+        $item = Item::withTrashed()->firstOrFail();
+        if ($item->trashed()) {
+            $item->restore();
+        }
+
+        // Buat BAST yang sengaja dibuat lewat tanggal jatuh tempo
+        $overdueDoc = HandoverDocument::create([
+            'document_no' => 'BAST-TEST-OVERDUE-001',
+            'document_type' => 'bast',
+            'loan_type' => 'pinjam_pakai',
+            'document_date' => now()->subDays(10)->toDateString(),
+            'expected_return_date' => now()->subDays(3)->toDateString(), // Terlambat 3 hari
+            'first_party_name' => 'Petugas Gudang',
+            'second_party_name' => 'Peminjam Telat',
+            'second_party_phone' => '081234567899',
+            'user_id' => $admin->id,
+            'status' => 'active',
+        ]);
+
+        $this->assertTrue($overdueDoc->is_overdue);
+        $this->assertEquals(3, $overdueDoc->days_overdue);
+        $this->assertNotNull($overdueDoc->whatsapp_reminder_url);
+        $this->assertStringContainsString('6281234567899', $overdueDoc->whatsapp_reminder_url);
+
+        // Pastikan muncul di Dashboard
+        $resDash = $this->get(route('dashboard'));
+        $resDash->assertStatus(200);
+        $resDash->assertSee('Radar Pengingat:');
+        $resDash->assertSee('Peminjam Telat');
+    }
 }

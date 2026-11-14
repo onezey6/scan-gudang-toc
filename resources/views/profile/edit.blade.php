@@ -244,6 +244,35 @@
                         @endforeach
                     </div>
                 </div>
+
+                <!-- Kartu Cadangan Database 1-Klik (Disaster Recovery) -->
+                <div class="bg-gradient-to-br from-[#0B1120] to-slate-900 text-white rounded-2xl border-2 border-emerald-500/40 p-5 shadow-lg relative overflow-hidden">
+                    <div class="pointer-events-none absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-emerald-500/20 blur-xl"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-300 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-extrabold uppercase tracking-wide text-white">Cadangan Database (Disaster Recovery)</h4>
+                            <p class="text-xs text-slate-300 mt-0.5">Unduh seluruh master barang, barcode, transaksi scan, dan BAST/BAP dalam format SQL.</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3.5 border-t border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="text-[11px] text-emerald-400 font-mono-code flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Mesin: MariaDB / MySQL Full Dump</span>
+                        </div>
+                        <a href="{{ route('settings.backup-db') }}"
+                           class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            <span>Unduh Backup (.SQL)</span>
+                        </a>
+                    </div>
+                </div>
             @endif
 
             <!-- Riwayat Akses Pribadi -->

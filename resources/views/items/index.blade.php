@@ -222,6 +222,11 @@
                                        class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold">
                                         Scan
                                     </a>
+                                    <a href="{{ route('items.stock-card', $item) }}" target="_blank"
+                                       title="Lihat & Cetak Kartu Kendali Stok"
+                                       class="px-2.5 py-1.5 rounded-lg bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 text-xs font-semibold">
+                                        Kartu Stok
+                                    </a>
                                     <a href="{{ route('items.barcode-studio', ['item_id' => $item->id]) }}"
                                        title="Cetak Stiker Barcode"
                                        class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">

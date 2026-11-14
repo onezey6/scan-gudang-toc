@@ -17,10 +17,19 @@ class DashboardController extends Controller
         $totalInAllTime = (int) StockMovement::where('movement_type', 'in')->sum('quantity');
         $totalOutAllTime = (int) StockMovement::where('movement_type', 'out')->sum('quantity');
 
+        $overdueHandovers = HandoverDocument::where('document_type', 'bast')
+            ->where('status', 'active')
+            ->whereNotNull('expected_return_date')
+            ->where('expected_return_date', '<', $today)
+            ->with(['items.item', 'user'])
+            ->orderBy('expected_return_date', 'asc')
+            ->get();
+
         $stats = [
             'total_items' => Item::count(),
             'total_stock' => (int) Item::sum('stock'),
             'low_stock_count' => Item::whereColumn('stock', '<=', 'min_stock')->count(),
+            'overdue_count' => $overdueHandovers->count(),
             'today_in_count' => StockMovement::whereDate('scanned_at', $today)->where('movement_type', 'in')->count(),
             'today_in_qty' => (int) StockMovement::whereDate('scanned_at', $today)->where('movement_type', 'in')->sum('quantity'),
             'today_out_count' => StockMovement::whereDate('scanned_at', $today)->where('movement_type', 'out')->count(),
@@ -73,7 +82,8 @@ class DashboardController extends Controller
             'lowStockItems',
             'recentItems',
             'recentAccessLogs',
-            'statusItems'
+            'statusItems',
+            'overdueHandovers'
         ));
     }
 }

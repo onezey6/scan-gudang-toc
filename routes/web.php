@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccessLogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\HandoverController;
@@ -16,6 +17,13 @@ Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
         : redirect()->route('login');
+});
+
+Route::get('/manifest.json', function () {
+    $manifest = json_decode(file_get_contents(public_path('manifest.json')), true);
+    return response()->json($manifest, 200, [
+        'Content-Type' => 'application/manifest+json; charset=utf-8',
+    ]);
 });
 
 // Guest / Authentication Routes
@@ -45,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/items/generate-code', [ItemController::class, 'generateCode'])->name('items.generate-code');
     Route::get('/barcode-studio', [ItemController::class, 'barcodeStudio'])->name('items.barcode-studio');
     Route::get('/items/barcode-studio', [ItemController::class, 'barcodeStudio']);
+    Route::get('/items/{item}/stock-card', [ItemController::class, 'stockCard'])->name('items.stock-card');
     Route::post('/categories', [ItemController::class, 'storeCategory'])->name('categories.store');
 
     // 2 & 6. Terminal Scan Barcode Masuk & Keluar ke Database Penyimpanan (beserta user petugas scan)
@@ -86,4 +95,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::post('/profile/users', [ProfileController::class, 'storeUser'])->name('profile.users.store');
     Route::patch('/profile/users/{targetUser}/toggle', [ProfileController::class, 'toggleUser'])->name('profile.users.toggle');
+
+    // Pencadangan Database (Admin Only)
+    Route::get('/settings/backup-database', [BackupController::class, 'download'])->name('settings.backup-db');
 });

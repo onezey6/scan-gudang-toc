@@ -287,9 +287,15 @@
 
                             <td class="py-3.5 px-4 align-top">
                                 @if ($doc->document_type === 'bast' && $doc->status === 'active')
-                                    <span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                                        Diserahkan / Aktif
-                                    </span>
+                                    @if ($doc->is_overdue)
+                                        <span class="px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
+                                            Jatuh Tempo (+{{ $doc->days_overdue }} Hari)
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                            Diserahkan / Aktif
+                                        </span>
+                                    @endif
                                 @elseif ($doc->status === 'returned')
                                     <span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         Sudah Dikembalikan
@@ -312,6 +318,12 @@
                                        class="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold">
                                         Cetak PDF
                                     </a>
+                                    @if ($doc->is_overdue && $doc->whatsapp_reminder_url)
+                                        <a href="{{ $doc->whatsapp_reminder_url }}" target="_blank"
+                                           class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold inline-flex items-center gap-1 shadow-sm">
+                                            <span>WA Ingatkan</span>
+                                        </a>
+                                    @endif
                                     @if ($doc->document_type === 'bast' && $doc->status === 'active')
                                         <a href="{{ route('handovers.create', ['type' => 'bap', 'bast_id' => $doc->id]) }}"
                                            class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold">

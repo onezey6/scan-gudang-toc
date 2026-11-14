@@ -91,6 +91,52 @@ class HandoverDocument extends Model
         return self::loanTypeOptions()[$this->loan_type ?? 'pinjam_pakai'] ?? 'Pinjam Pakai Operasional';
     }
 
+    public function getIsOverdueAttribute(): bool
+    {
+        if ($this->document_type !== 'bast' || $this->status !== 'active' || empty($this->expected_return_date)) {
+            return false;
+        }
+
+        return $this->expected_return_date->startOfDay()->lt(now()->startOfDay());
+    }
+
+    public function getDaysOverdueAttribute(): int
+    {
+        if (!$this->is_overdue) {
+            return 0;
+        }
+
+        return max(1, (int) $this->expected_return_date->startOfDay()->diffInDays(now()->startOfDay()));
+    }
+
+    public function getWhatsappReminderUrlAttribute(): ?string
+    {
+        if (empty($this->second_party_phone)) {
+            return null;
+        }
+
+        $phone = preg_replace('/[^0-9]/', '', $this->second_party_phone);
+        if (str_starts_with($phone, '0')) {
+            $phone = '62' . substr($phone, 1);
+        }
+
+        $itemNames = $this->items->map(function ($it) {
+            return ($it->item->name ?? 'Barang') . ' (' . $it->quantity . ' Unit)';
+        })->implode(', ');
+
+        $tglKembali = $this->expected_return_date ? $this->expected_return_date->format('d/m/Y') : '-';
+        $days = $this->days_overdue;
+
+        $msg = "Yth. Bpk/Ibu *{$this->second_party_name}*,\n\n"
+            . "Kami dari *Tim Logistik TOC* menginformasikan bahwa peminjaman barang inventaris kedinasan berdasarkan dokumen *{$this->document_no}*:\n"
+            . "- Barang: {$itemNames}\n"
+            . "- Batas Waktu: {$tglKembali} (*Terlambat {$days} Hari*)\n\n"
+            . "Mohon untuk segera menyerahkan kembali barang tersebut ke Gudang Logistik TOC untuk pemeriksaan fisik dan penerbitan Berita Acara Pengembalian (BAP) resmi.\n\n"
+            . "Terima kasih atas perhatian dan kerjasamanya.\n_Logistik TOC System_";
+
+        return "https://wa.me/{$phone}?text=" . rawurlencode($msg);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

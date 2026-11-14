@@ -270,6 +270,22 @@ class ItemController extends Controller
         ));
     }
 
+    public function stockCard(Item $item)
+    {
+        $item->load(['category', 'creator']);
+
+        $movements = $item->stockMovements()
+            ->with(['user', 'handoverDocument'])
+            ->orderBy('scanned_at', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $totalIn = (int) $item->stockMovements()->where('movement_type', 'in')->sum('quantity');
+        $totalOut = (int) $item->stockMovements()->where('movement_type', 'out')->sum('quantity');
+
+        return view('items.stock_card', compact('item', 'movements', 'totalIn', 'totalOut'));
+    }
+
     public function storeCategory(Request $request)
     {
         $validated = $request->validate([

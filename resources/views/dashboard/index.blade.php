@@ -56,6 +56,72 @@
         </div>
     </div>
 
+    @if ($overdueHandovers->count() > 0)
+        <!-- Radar Taktis Peringatan Barang Jatuh Tempo (Overdue Alert) -->
+        <div class="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-rose-950/90 via-slate-900 to-rose-950/70 border-2 border-rose-500/60 shadow-[0_0_25px_rgba(244,63,94,0.25)] text-white relative overflow-hidden">
+            <div class="pointer-events-none absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-rose-500/20 blur-2xl"></div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-rose-500/30">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/50 flex items-center justify-center text-rose-300 shrink-0">
+                        <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-sm sm:text-base font-extrabold uppercase tracking-wide text-rose-300">
+                                Radar Pengingat: {{ $overdueHandovers->count() }} Dokumen BAST Melewati Jatuh Tempo!
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white animate-pulse">PERHATIAN</span>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-0.5">Barang pinjaman operasional di bawah ini belum dikembalikan ke gudang melewati batas waktu resmi.</p>
+                    </div>
+                </div>
+                <a href="{{ route('handovers.index', ['type' => 'bast']) }}"
+                   class="inline-flex items-center gap-1 text-xs font-bold text-rose-300 hover:text-white underline shrink-0">
+                    <span>Lihat Semua Dokumen BAST &rarr;</span>
+                </a>
+            </div>
+
+            <div class="mt-3.5 space-y-2.5">
+                @foreach ($overdueHandovers->take(4) as $oDoc)
+                    <div class="p-3 rounded-2xl bg-black/40 border border-rose-500/30 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-mono-code font-bold text-xs text-rose-400">{{ $oDoc->document_no }}</span>
+                                <span class="text-slate-500">•</span>
+                                <span class="text-xs font-bold text-white">{{ $oDoc->second_party_name }} ({{ $oDoc->second_party_unit ?: 'Unit Operasional' }})</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                    ⏰ Terlambat {{ $oDoc->days_overdue }} Hari
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-slate-300 mt-1 truncate">
+                                Barang: <strong class="text-white">{{ $oDoc->items->map(fn($i) => ($i->item->name ?? 'Barang') . ' (' . $i->quantity . ' Unit)')->implode(', ') }}</strong>
+                                • Batas Kembali: <span class="text-rose-300 font-semibold">{{ $oDoc->expected_return_date?->format('d/m/Y') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            @if ($oDoc->whatsapp_reminder_url)
+                                <a href="{{ $oDoc->whatsapp_reminder_url }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.072.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.13.332.202.043.073.043.419-.101.824z"/>
+                                    </svg>
+                                    <span>Ingatkan via WA</span>
+                                </a>
+                            @endif
+                            <a href="{{ route('handovers.create', ['type' => 'bap', 'related_bast_id' => $oDoc->id]) }}"
+                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-teal-300 border border-slate-700 text-xs font-bold transition-all">
+                                <span>Terima Kembali (BAP)</span>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <!-- Metric Cards Grid (2 Columns on Mobile, 4 Columns on Desktop) -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5 mb-6">
         <div class="card-elevated bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs relative overflow-hidden">

@@ -2,9 +2,19 @@
 <html lang="id" class="h-full bg-[#F4F7FB]">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'LogiScan Pro') — Sistem Barcode & Gudang Logistik</title>
+    <title>@yield('title', 'LOGISTIK.TOC') — Sistem Barcode & Gudang Logistik</title>
+
+    <!-- PWA Progressive Web App Meta Tags & Manifest -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0B1120">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGISTIK.TOC">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo-toc.jpg') }}">
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-toc.jpg') }}">
     <script>
         // Terapkan tema sebelum halaman dirender (anti kedip). Default: Mode Cyber.
         (function () {
@@ -743,6 +753,13 @@
                     </div>
                 </div>
                 <div class="space-y-2">
+                    <button type="button" id="pwa-install-btn-mobile" onclick="triggerPwaInstall()"
+                            class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 18h16"/>
+                        </svg>
+                        <span>Pasang / Install di Layar HP</span>
+                    </button>
                     <button type="button" onclick="toggleAppTheme()" class="w-full py-2.5 rounded-xl border border-slate-700 text-sm font-bold text-slate-200 hover:bg-slate-800">
                         <span class="cyber-only">Ganti ke Mode Terang</span>
                         <span class="light-only">Ganti ke Mode Cyber</span>
@@ -948,6 +965,67 @@
             setInterval(updateDisplay, 1000);
         }
 
+        // Web Audio API Sound Feedback (Crisp Beep & Warning Buzzer)
+        function playScanSound(type) {
+            try {
+                var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return;
+                var ctx = new AudioContextClass();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                if (type === 'success' || !type) {
+                    var osc = ctx.createOscillator();
+                    var gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, ctx.currentTime);
+                    osc.frequency.setValueAtTime(1760, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.22);
+                } else if (type === 'error') {
+                    var oscErr = ctx.createOscillator();
+                    var gainErr = ctx.createGain();
+                    oscErr.type = 'sawtooth';
+                    oscErr.frequency.setValueAtTime(220, ctx.currentTime);
+                    oscErr.frequency.linearRampToValueAtTime(160, ctx.currentTime + 0.28);
+                    gainErr.gain.setValueAtTime(0.25, ctx.currentTime);
+                    gainErr.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+                    oscErr.connect(gainErr);
+                    gainErr.connect(ctx.destination);
+                    oscErr.start();
+                    oscErr.stop(ctx.currentTime + 0.28);
+                }
+            } catch (err) {}
+        }
+
+        // PWA Service Worker & Install Prompt
+        var deferredPwaPrompt = null;
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            var installBanner = document.getElementById('pwa-install-banner');
+            if (installBanner) installBanner.classList.remove('hidden');
+            var installBtnMobile = document.getElementById('pwa-install-btn-mobile');
+            if (installBtnMobile) installBtnMobile.classList.remove('hidden');
+        });
+
+        function triggerPwaInstall() {
+            if (deferredPwaPrompt) {
+                deferredPwaPrompt.prompt();
+                deferredPwaPrompt.userChoice.then(function (choice) {
+                    deferredPwaPrompt = null;
+                    var installBanner = document.getElementById('pwa-install-banner');
+                    if (installBanner) installBanner.classList.add('hidden');
+                });
+            } else {
+                alert('Untuk memasang aplikasi di HP: Tekan tombol Menu browser (titik 3 di kanan atas Chrome, atau tombol Share di Safari iOS), lalu pilih "Tambahkan ke Layar Utama" (Add to Home Screen).');
+            }
+        }
+
         function startLiveClock() {
             var clockEl = document.getElementById('live-wib-clock');
             if (!clockEl) return;
@@ -967,6 +1045,11 @@
             renderAllBarcodes();
             startLiveClock();
             startSession15MinTimer();
+
+            // Register PWA Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(function () {});
+            }
         });
     </script>
 

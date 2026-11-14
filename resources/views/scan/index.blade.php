@@ -551,7 +551,11 @@
             var errCard = document.getElementById('detected-error-card');
 
             if (data.found && data.item) {
-                playBeep();
+                if (typeof playScanSound === 'function') {
+                    playScanSound('success');
+                } else if (typeof playBeep === 'function') {
+                    playBeep();
+                }
                 errCard.classList.add('hidden');
                 card.classList.remove('hidden');
 
@@ -588,6 +592,9 @@
 
                 document.getElementById('scan_qty').focus();
             } else {
+                if (typeof playScanSound === 'function') {
+                    playScanSound('error');
+                }
                 card.classList.add('hidden');
                 errCard.classList.remove('hidden');
                 errCard.textContent = data.message || 'Barang dengan barcode tersebut belum terdaftar.';

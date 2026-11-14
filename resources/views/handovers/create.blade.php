@@ -893,9 +893,11 @@
                     var code = quickInput.value.trim();
                     var found = itemsCatalog.find(function (it) { return it.barcode === code; });
                     if (found) {
+                        if (typeof playScanSound === 'function') playScanSound('success');
                         addHandoverItemRow(found.id);
                         quickInput.value = '';
                     } else {
+                        if (typeof playScanSound === 'function') playScanSound('error');
                         alert('Barcode "' + code + '" tidak ditemukan pada katalog barang.');
                     }
                 }
