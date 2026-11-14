@@ -396,4 +396,52 @@ class LogisticsFlowTest extends TestCase
         $this->assertStringContainsString('uploads/avatars/', $user->avatar);
         $this->assertNotNull($user->avatar_url);
     }
+
+    public function test_item_creation_works_even_when_all_existing_items_are_in_trash_without_unique_collision(): void
+    {
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+
+        // Soft-delete SEMUA item ke kotak sampah (seperti kondisi user: 8 item di trash)
+        Item::all()->each(fn($i) => $i->delete());
+        $this->assertEquals(0, Item::count());
+        $this->assertGreaterThan(0, Item::onlyTrashed()->count());
+
+        // Buka halaman tambah barang dan ambil kode otomatis
+        $resPage = $this->get('/items');
+        $resPage->assertStatus(200);
+
+        // Ambil kode & barcode unik dari service
+        $nextCode = \App\Services\CodeGeneratorService::nextItemCode();
+        $nextBarcode = \App\Services\CodeGeneratorService::nextBarcodeValue();
+
+        // Pastikan kode yang di-generate TIDAK bentrok dengan yang ada di trash
+        $this->assertFalse(Item::withTrashed()->where('item_code', $nextCode)->exists());
+        $this->assertFalse(Item::withTrashed()->where('barcode', $nextBarcode)->exists());
+
+        // Tambah barang baru dengan kode otomatis tersebut
+        $createRes = $this->post('/items', [
+            'item_code' => $nextCode,
+            'barcode' => $nextBarcode,
+            'name' => 'Kamera Drone Taktis Baru',
+            'item_type' => 'asset',
+            'unit' => 'Unit',
+            'stock' => 3,
+            'min_stock' => 1,
+            'storage_location' => 'Lemari Khusus',
+            'condition_status' => 'Baik',
+            'availability_status' => 'sedia',
+        ]);
+
+        $createRes->assertRedirect(route('items.index'));
+        $createRes->assertSessionHasNoErrors();
+
+        // Pastikan barang baru tersimpan di database
+        $this->assertDatabaseHas('items', [
+            'item_code' => $nextCode,
+            'barcode' => $nextBarcode,
+            'name' => 'Kamera Drone Taktis Baru',
+            'deleted_at' => null,
+        ]);
+    }
 }

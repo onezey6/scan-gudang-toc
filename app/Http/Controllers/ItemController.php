@@ -86,6 +86,14 @@ class ItemController extends Controller
             'condition_status' => ['required', 'string', 'max:50'],
             'availability_status' => ['nullable', 'in:sedia,sedang_keluar,sedang_dipakai,sedang_dipinjam'],
             'description' => ['nullable', 'string'],
+        ], [
+            'item_code.unique' => 'Kode Barang tersebut sudah digunakan di sistem (atau berada di Kotak Sampah).',
+            'barcode.unique' => 'Kode Barcode tersebut sudah digunakan di sistem (atau berada di Kotak Sampah).',
+            'name.required' => 'Nama barang wajib diisi.',
+            'unit.required' => 'Satuan barang wajib diisi.',
+            'stock.required' => 'Jumlah stok awal wajib diisi.',
+            'min_stock.required' => 'Batas minimum stok aman wajib diisi.',
+            'condition_status.required' => 'Kondisi barang wajib dipilih.',
         ]);
 
         $user = Auth::user();
@@ -167,6 +175,13 @@ class ItemController extends Controller
             'condition_status' => ['required', 'string', 'max:50'],
             'availability_status' => ['nullable', 'in:sedia,sedang_keluar,sedang_dipakai,sedang_dipinjam'],
             'description' => ['nullable', 'string'],
+        ], [
+            'item_code.unique' => 'Kode Barang tersebut sudah digunakan di sistem (atau berada di Kotak Sampah).',
+            'barcode.unique' => 'Kode Barcode tersebut sudah digunakan di sistem (atau berada di Kotak Sampah).',
+            'name.required' => 'Nama barang wajib diisi.',
+            'unit.required' => 'Satuan barang wajib diisi.',
+            'min_stock.required' => 'Batas minimum stok aman wajib diisi.',
+            'condition_status.required' => 'Kondisi barang wajib dipilih.',
         ]);
 
         $user = Auth::user();

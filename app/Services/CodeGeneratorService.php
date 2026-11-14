@@ -16,7 +16,8 @@ class CodeGeneratorService
         $ym = $period ?: now()->format('Ym');
         $prefix = "BRG-{$ym}-";
 
-        $lastCode = Item::where('item_code', 'like', $prefix . '%')
+        $lastCode = Item::withTrashed()
+            ->where('item_code', 'like', $prefix . '%')
             ->lockForUpdate()
             ->orderByDesc('item_code')
             ->value('item_code');
@@ -26,7 +27,13 @@ class CodeGeneratorService
             $nextNum = ((int) $matches[1]) + 1;
         }
 
-        return $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        $candidate = $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        while (Item::withTrashed()->where('item_code', $candidate)->exists()) {
+            $nextNum++;
+            $candidate = $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        }
+
+        return $candidate;
     }
 
     /**
@@ -37,7 +44,8 @@ class CodeGeneratorService
         $ym = $period ?: now()->format('Ym');
         $prefix = "899{$ym}";
 
-        $lastBarcode = Item::where('barcode', 'like', $prefix . '%')
+        $lastBarcode = Item::withTrashed()
+            ->where('barcode', 'like', $prefix . '%')
             ->lockForUpdate()
             ->orderByDesc('barcode')
             ->value('barcode');
@@ -51,7 +59,7 @@ class CodeGeneratorService
         }
 
         $candidate = $prefix . str_pad((string) $nextNum, 4, '0', STR_PAD_LEFT);
-        while (Item::where('barcode', $candidate)->exists()) {
+        while (Item::withTrashed()->where('barcode', $candidate)->exists()) {
             $nextNum++;
             $candidate = $prefix . str_pad((string) $nextNum, 4, '0', STR_PAD_LEFT);
         }
@@ -78,7 +86,13 @@ class CodeGeneratorService
             $nextNum = ((int) $matches[1]) + 1;
         }
 
-        return $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        $candidate = $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        while (StockMovement::where('reference_no', $candidate)->exists()) {
+            $nextNum++;
+            $candidate = $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        }
+
+        return $candidate;
     }
 
     /**
@@ -90,7 +104,8 @@ class CodeGeneratorService
         $ym = now()->format('Ym');
         $prefix = "{$typeCode}-{$ym}-";
 
-        $lastDoc = HandoverDocument::where('document_no', 'like', $prefix . '%')
+        $lastDoc = HandoverDocument::withTrashed()
+            ->where('document_no', 'like', $prefix . '%')
             ->lockForUpdate()
             ->orderByDesc('document_no')
             ->value('document_no');
@@ -100,6 +115,12 @@ class CodeGeneratorService
             $nextNum = ((int) $matches[1]) + 1;
         }
 
-        return $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        $candidate = $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        while (HandoverDocument::withTrashed()->where('document_no', $candidate)->exists()) {
+            $nextNum++;
+            $candidate = $prefix . str_pad((string) $nextNum, 3, '0', STR_PAD_LEFT);
+        }
+
+        return $candidate;
     }
 }

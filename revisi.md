@@ -1,2 +1,2 @@
 # DRAF REVISI & TAMBAHAN FITUR (WORKSPACE SEMENTARA)
-> **Status Saat Ini:** Kosong (Seluruh 5 poin perbaikan: Sesi 15 menit login ketat, Tactical HUD di menu BAST/BAP & Dashboard, modal download barcode PNG & foto, fitur upload foto profil avatar, serta sinkronisasi data laporan scan & hapus data telah berhasil diterapkan, diuji otomatis, dan disinkronkan).
+> **Status Saat Ini:** Kosong (Perbaikan error validation.unique pada tambah barang telah berhasil diatasi dengan menambahkan withTrashed() pada generator sekuensial kode & barcode, proteksi loop anti-bentrok, serta kamus pesan validasi bahasa Indonesia lengkap).
