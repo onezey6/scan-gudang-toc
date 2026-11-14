@@ -177,8 +177,11 @@
                             {{ $pctSedia }}%
                         </span>
                     </div>
-                    <div class="text-3xl sm:text-4xl font-extrabold text-emerald-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
-                        {{ $stats['status_sedia'] ?? 0 }}
+                    <div class="flex items-baseline gap-1.5 font-sans my-1">
+                        <span class="text-3xl sm:text-4xl font-black font-sans text-emerald-300 tracking-tight leading-none drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
+                            {{ $stats['status_sedia'] ?? 0 }}
+                        </span>
+                        <span class="text-xs uppercase font-black text-emerald-400/80 font-sans tracking-wider">Unit</span>
                     </div>
                     <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
                         <span>Siap di Gudang</span>
@@ -203,8 +206,11 @@
                             {{ $pctKeluar }}%
                         </span>
                     </div>
-                    <div class="text-3xl sm:text-4xl font-extrabold text-amber-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(251,191,36,0.5)]">
-                        {{ $stats['status_sedang_keluar'] ?? 0 }}
+                    <div class="flex items-baseline gap-1.5 font-sans my-1">
+                        <span class="text-3xl sm:text-4xl font-black font-sans text-amber-300 tracking-tight leading-none drop-shadow-[0_0_12px_rgba(251,191,36,0.5)]">
+                            {{ $stats['status_sedang_keluar'] ?? 0 }}
+                        </span>
+                        <span class="text-xs uppercase font-black text-amber-400/80 font-sans tracking-wider">Unit</span>
                     </div>
                     <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
                         <span>Mutasi Keluar</span>
@@ -229,8 +235,11 @@
                             {{ $pctDipakai }}%
                         </span>
                     </div>
-                    <div class="text-3xl sm:text-4xl font-extrabold text-cyan-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]">
-                        {{ $stats['status_sedang_dipakai'] ?? 0 }}
+                    <div class="flex items-baseline gap-1.5 font-sans my-1">
+                        <span class="text-3xl sm:text-4xl font-black font-sans text-cyan-300 tracking-tight leading-none drop-shadow-[0_0_12px_rgba(34,211,238,0.5)]">
+                            {{ $stats['status_sedang_dipakai'] ?? 0 }}
+                        </span>
+                        <span class="text-xs uppercase font-black text-cyan-400/80 font-sans tracking-wider">Unit</span>
                     </div>
                     <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
                         <span>Giat Operasional</span>
@@ -255,8 +264,11 @@
                             {{ $pctDipinjam }}%
                         </span>
                     </div>
-                    <div class="text-3xl sm:text-4xl font-extrabold text-indigo-300 font-mono-code tracking-tight leading-none drop-shadow-[0_0_12px_rgba(129,140,248,0.5)]">
-                        {{ $stats['status_sedang_dipinjam'] ?? 0 }}
+                    <div class="flex items-baseline gap-1.5 font-sans my-1">
+                        <span class="text-3xl sm:text-4xl font-black font-sans text-indigo-300 tracking-tight leading-none drop-shadow-[0_0_12px_rgba(129,140,248,0.5)]">
+                            {{ $stats['status_sedang_dipinjam'] ?? 0 }}
+                        </span>
+                        <span class="text-xs uppercase font-black text-indigo-400/80 font-sans tracking-wider">Unit</span>
                     </div>
                     <div class="mt-2 text-xs font-bold text-slate-200 flex items-center justify-between">
                         <span>Pinjam Pakai BAST</span>

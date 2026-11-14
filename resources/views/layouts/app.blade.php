@@ -443,9 +443,13 @@
             <!-- User Footer Card -->
             <div class="relative p-4 border-t border-slate-800/80 bg-slate-950/60">
                 <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-sm shrink-0 shadow-sm">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                    </div>
+                    @if (auth()->user()->avatar_url)
+                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-xl object-cover border border-emerald-400/50 shadow-sm shrink-0">
+                    @else
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-sm shrink-0 shadow-sm">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                        </div>
+                    @endif
                     <div class="min-w-0 flex-1">
                         <div class="text-[10px] font-mono-code text-cyan-400 cyber-only">OPERATOR</div>
                         <div class="text-sm font-bold text-white leading-tight truncate">{{ auth()->user()->name }}</div>
@@ -544,9 +548,13 @@
 
                     <a href="{{ route('profile.edit') }}"
                        class="hidden md:inline-flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 shadow-2xs transition-all duration-200">
-                        <span class="w-7 h-7 rounded-lg bg-slate-900 text-emerald-400 flex items-center justify-center font-extrabold text-xs">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-                        </span>
+                        @if (auth()->user()->avatar_url)
+                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="w-7 h-7 rounded-lg object-cover border border-emerald-400/50 shadow-xs shrink-0">
+                        @else
+                            <span class="w-7 h-7 rounded-lg bg-slate-900 text-emerald-400 flex items-center justify-center font-extrabold text-xs shrink-0">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                            </span>
+                        @endif
                         <div class="text-left leading-tight">
                             <div class="text-xs font-bold text-slate-900">{{ auth()->user()->name }}</div>
                             <div class="text-[10px] text-slate-400 font-medium">{{ auth()->user()->isAdmin() ? 'Admin' : 'Staff' }}</div>
@@ -806,9 +814,14 @@
             var modal = document.getElementById('global-photo-lightbox');
             var img = document.getElementById('global-photo-lightbox-img');
             var caption = document.getElementById('global-photo-lightbox-title');
+            var downloadBtn = document.getElementById('global-photo-lightbox-download');
             if (!modal || !img) return;
             img.src = url;
             if (caption) caption.textContent = title || 'Foto Barang Logistik';
+            if (downloadBtn) {
+                downloadBtn.href = url;
+                downloadBtn.download = (title ? title.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'foto-barang') + '.jpg';
+            }
             modal.classList.remove('hidden');
         }
 
@@ -817,37 +830,111 @@
             if (modal) modal.classList.add('hidden');
         }
 
-        // Fitur 15 Menit Auto-Login / Sesi Aktif (900 Detik)
-        function startSession15MinTimer() {
-            var maxSeconds = 15 * 60; // 15 menit = 900 detik
-            var remaining = maxSeconds;
-            var timerEl = document.getElementById('session-countdown-timer');
+        var currentBarcodeData = { code: '', name: '', itemCode: '' };
 
-            function resetTimer() {
-                remaining = maxSeconds;
+        function openBarcodeModal(barcode, name, itemCode, categoryName, brand, stock) {
+            currentBarcodeData = { code: barcode, name: name, itemCode: itemCode };
+            var modal = document.getElementById('global-barcode-modal');
+            var svg = document.getElementById('barcode-modal-svg');
+            var nameEl = document.getElementById('barcode-modal-name');
+            var detailsEl = document.getElementById('barcode-modal-details');
+            var printBtn = document.getElementById('barcode-modal-print-btn');
+
+            if (nameEl) nameEl.textContent = name;
+            if (detailsEl) detailsEl.textContent = 'Kode: ' + itemCode + ' • Kategori: ' + (categoryName || '-') + (brand ? ' • Merek: ' + brand : '') + (stock ? ' • Stok: ' + stock : '');
+            if (printBtn) printBtn.href = '{{ route('items.barcode-studio') }}?barcode=' + encodeURIComponent(barcode);
+
+            if (svg && typeof JsBarcode === 'function') {
                 try {
-                    sessionStorage.setItem('toc_last_activity', String(Date.now()));
-                } catch (e) {}
+                    JsBarcode(svg, barcode, {
+                        format: "CODE128",
+                        width: 2.2,
+                        height: 64,
+                        displayValue: true,
+                        fontSize: 14,
+                        margin: 8,
+                        background: "#ffffff",
+                        lineColor: "#000000"
+                    });
+                } catch (e) {
+                    console.error('Barcode render error:', e);
+                }
             }
 
-            ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(function (evt) {
-                document.addEventListener(evt, resetTimer, { passive: true });
-            });
+            if (modal) modal.classList.remove('hidden');
+        }
 
-            setInterval(function () {
-                remaining--;
-                if (remaining < 0) remaining = 0;
-                var mm = String(Math.floor(remaining / 60)).padStart(2, '0');
-                var ss = String(remaining % 60).padStart(2, '0');
+        function closeBarcodeModal() {
+            var modal = document.getElementById('global-barcode-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function downloadCurrentBarcodePng() {
+            var svg = document.getElementById('barcode-modal-svg');
+            var canvas = document.getElementById('barcode-modal-canvas');
+            if (!svg || !canvas) return;
+
+            var xml = new XMLSerializer().serializeToString(svg);
+            var svg64 = btoa(unescape(encodeURIComponent(xml)));
+            var image64 = 'data:image/svg+xml;base64,' + svg64;
+
+            var img = new Image();
+            img.onload = function () {
+                var padding = 20;
+                canvas.width = img.width + (padding * 2);
+                canvas.height = img.height + 70;
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillStyle = '#0f172a';
+                ctx.textAlign = 'center';
+                ctx.fillText('LOGISTIK.TOC • ' + (currentBarcodeData.name || 'BARCODE BARANG'), canvas.width / 2, 22);
+
+                ctx.font = '11px monospace';
+                ctx.fillStyle = '#64748b';
+                ctx.fillText('KODE: ' + (currentBarcodeData.itemCode || '-'), canvas.width / 2, 38);
+
+                ctx.drawImage(img, padding, 48);
+
+                var a = document.createElement('a');
+                a.download = 'barcode-' + (currentBarcodeData.code || 'export') + '.png';
+                a.href = canvas.toDataURL('image/png');
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            };
+            img.src = image64;
+        }
+
+        // Fitur 15 Menit Sesi Ketat Persisten (900 Detik Tanpa Reset Gerak Mouse)
+        function startSession15MinTimer() {
+            var sessionDuration = 15 * 60 * 1000; // 15 menit = 900.000 ms
+            var storedExpires = sessionStorage.getItem('toc_session_expires_at');
+            var now = Date.now();
+
+            if (!storedExpires || parseInt(storedExpires, 10) <= now) {
+                storedExpires = String(now + sessionDuration);
+                sessionStorage.setItem('toc_session_expires_at', storedExpires);
+            }
+
+            var expiresAt = parseInt(storedExpires, 10);
+            var timerEl = document.getElementById('session-countdown-timer');
+            var mobileTimerEl = document.getElementById('session-countdown-mobile');
+
+            function updateDisplay() {
+                var remainingMs = Math.max(0, expiresAt - Date.now());
+                var remainingSec = Math.floor(remainingMs / 1000);
+                var mm = String(Math.floor(remainingSec / 60)).padStart(2, '0');
+                var ss = String(remainingSec % 60).padStart(2, '0');
                 var timeText = mm + ':' + ss;
-                if (timerEl) {
-                    timerEl.textContent = timeText;
-                }
-                var mobileTimerEl = document.getElementById('session-countdown-mobile');
-                if (mobileTimerEl) {
-                    mobileTimerEl.textContent = timeText;
-                }
-                if (remaining === 0) {
+
+                if (timerEl) timerEl.textContent = timeText;
+                if (mobileTimerEl) mobileTimerEl.textContent = timeText;
+
+                if (remainingSec <= 0) {
+                    sessionStorage.removeItem('toc_session_expires_at');
                     var logoutForm = document.getElementById('auto-logout-form');
                     if (logoutForm) {
                         logoutForm.submit();
@@ -855,7 +942,10 @@
                         window.location.href = '{{ route('login') }}';
                     }
                 }
-            }, 1000);
+            }
+
+            updateDisplay();
+            setInterval(updateDisplay, 1000);
         }
 
         function startLiveClock() {
@@ -891,14 +981,78 @@
         <div class="relative z-10 max-w-lg w-full bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
             <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
                 <h4 id="global-photo-lightbox-title" class="text-sm font-bold truncate">Foto Barang Logistik</h4>
-                <button type="button" onclick="closePhotoLightbox()" class="text-slate-400 hover:text-white">
+                <div class="flex items-center gap-2">
+                    <a id="global-photo-lightbox-download" href="#" download="foto-barang.jpg"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Unduh Foto</span>
+                    </a>
+                    <button type="button" onclick="closePhotoLightbox()" class="text-slate-400 hover:text-white p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4 flex items-center justify-center bg-slate-950/40">
+                <img id="global-photo-lightbox-img" src="" alt="Foto Barang" class="max-h-[420px] w-auto rounded-xl object-contain">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pratinjau & Unduh Barcode Global (Gambar 3) -->
+    <div id="global-barcode-modal" class="no-print fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm" onclick="closeBarcodeModal()"></div>
+        <div class="relative z-10 max-w-md w-full bg-[#0B1120] text-white rounded-3xl border-2 border-cyan-500/40 shadow-2xl overflow-hidden">
+            <div class="px-5 py-4 bg-gradient-to-r from-[#070D18] via-[#0B1528] to-[#070D18] border-b border-cyan-500/20 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-extrabold uppercase tracking-wide text-white">Pratinjau & Unduh Barcode</h4>
+                        <p class="text-[11px] text-slate-400">Label barcode siap cetak dan simpan ke galeri perangkat</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeBarcodeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <div class="p-4 flex items-center justify-center bg-slate-950/40">
-                <img id="global-photo-lightbox-img" src="" alt="Foto Barang" class="max-h-[420px] w-auto rounded-xl object-contain">
+
+            <div class="p-5 space-y-4">
+                <div class="p-4 rounded-2xl bg-white text-slate-900 border-2 border-slate-200 text-center shadow-inner flex flex-col items-center justify-center">
+                    <div id="barcode-modal-title" class="text-xs font-bold text-slate-500 uppercase tracking-widest font-mono-code mb-1">LOGISTIK.TOC</div>
+                    <div id="barcode-modal-name" class="text-base font-extrabold text-slate-900 leading-tight mb-2">Nama Barang</div>
+                    <div class="w-full flex justify-center py-2">
+                        <svg id="barcode-modal-svg" class="max-w-[260px] h-auto"></svg>
+                    </div>
+                    <div id="barcode-modal-details" class="text-xs text-slate-500 font-medium mt-1">Kode: BRG-001 • Kategori: Aset</div>
+                </div>
+
+                <canvas id="barcode-modal-canvas" class="hidden"></canvas>
+
+                <div class="grid grid-cols-2 gap-2.5 pt-1">
+                    <button type="button" onclick="downloadCurrentBarcodePng()"
+                            class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 transition-all cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Unduh Barcode (PNG)</span>
+                    </button>
+                    <a id="barcode-modal-print-btn" href="#" target="_blank"
+                       class="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-extrabold text-xs flex items-center justify-center gap-2 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
+                        <span>Cetak Stiker Label</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

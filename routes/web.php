@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/print', [ReportController::class, 'print'])->name('reports.print');
     Route::get('/reports/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export-csv');
+    Route::delete('/reports/{movement}', [ReportController::class, 'destroy'])->name('reports.destroy');
 
     // 8. Berita Acara Serah Terima (BAST) & Berita Acara Pengembalian (BAP)
     Route::get('/handovers', [HandoverController::class, 'index'])->name('handovers.index');

@@ -140,9 +140,16 @@
                             </td>
 
                             <td class="py-3.5 px-4 align-top">
-                                <div class="keep-light inline-block bg-white px-1.5 py-0.5 rounded-md border border-slate-200">
-                                    <svg class="js-barcode max-w-[108px] h-auto block" data-barcode="{{ $item->barcode }}" data-height="18" data-width="0.9" data-fontsize="8" data-margin="1"></svg>
-                                </div>
+                                <button type="button"
+                                        onclick="openBarcodeModal('{{ $item->barcode }}', '{{ addslashes($item->name) }}', '{{ $item->item_code }}', '{{ addslashes($item->category?->name ?? 'Tanpa Kategori') }}', '{{ addslashes($item->brand ?? '-') }}', '{{ $item->stock }} {{ $item->unit }}')"
+                                        title="Klik untuk perbesar & unduh barcode barang"
+                                        class="keep-light inline-block bg-white px-2 py-1 rounded-lg border border-slate-200 hover:border-cyan-400 hover:shadow-md transition-all cursor-pointer group text-left">
+                                    <svg class="js-barcode max-w-[108px] h-auto block group-hover:scale-105 transition-transform" data-barcode="{{ $item->barcode }}" data-height="18" data-width="0.9" data-fontsize="8" data-margin="1"></svg>
+                                    <div class="text-[9px] text-center font-bold text-cyan-700 mt-0.5 group-hover:underline flex items-center justify-center gap-0.5">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <span>Unduh Barcode</span>
+                                    </div>
+                                </button>
                             </td>
 
                             <td class="py-3.5 px-4 align-top">
@@ -303,9 +310,16 @@
 
                     <!-- Tengah: Barcode Mini + Info Stok Fisik & Lokasi Rak -->
                     <div class="p-2.5 rounded-xl bg-slate-50/90 border border-slate-200/80 flex items-center justify-between gap-2.5">
-                        <div class="keep-light bg-white px-2 py-1 rounded-lg border border-slate-200 shrink-0 shadow-2xs">
-                            <svg class="js-barcode max-w-[105px] h-auto block" data-barcode="{{ $item->barcode }}" data-height="18" data-width="0.9" data-fontsize="8" data-margin="1"></svg>
-                        </div>
+                        <button type="button"
+                                onclick="openBarcodeModal('{{ $item->barcode }}', '{{ addslashes($item->name) }}', '{{ $item->item_code }}', '{{ addslashes($item->category?->name ?? 'Tanpa Kategori') }}', '{{ addslashes($item->brand ?? '-') }}', '{{ $item->stock }} {{ $item->unit }}')"
+                                title="Klik untuk perbesar & unduh barcode barang"
+                                class="keep-light bg-white px-2 py-1 rounded-lg border border-slate-200 shrink-0 shadow-2xs hover:border-cyan-400 transition-all cursor-pointer group text-left">
+                            <svg class="js-barcode max-w-[105px] h-auto block group-hover:scale-105 transition-transform" data-barcode="{{ $item->barcode }}" data-height="18" data-width="0.9" data-fontsize="8" data-margin="1"></svg>
+                            <div class="text-[9px] text-center font-bold text-cyan-700 mt-0.5 group-hover:underline flex items-center justify-center gap-0.5">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span>Unduh</span>
+                            </div>
+                        </button>
                         <div class="text-right">
                             <div class="text-[10px] text-slate-400 uppercase font-semibold leading-none">Stok Fisik:</div>
                             <div class="text-lg font-extrabold {{ $item->isLowStock() ? 'text-rose-600' : 'text-slate-900' }} leading-tight mt-0.5">

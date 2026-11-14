@@ -6,6 +6,7 @@ use App\Models\AccessLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -43,7 +44,20 @@ class ProfileController extends Controller
             'job_title' => ['nullable', 'string', 'max:120'],
             'department' => ['nullable', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:40'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
         ]);
+
+        $avatarPath = $user->avatar;
+
+        if ($request->hasFile('avatar')) {
+            $this->deleteAvatarFile($user->avatar);
+            $avatarPath = $this->handleAvatarUpload($request);
+        } elseif ($request->boolean('remove_avatar')) {
+            $this->deleteAvatarFile($user->avatar);
+            $avatarPath = null;
+        }
+
+        $validated['avatar'] = $avatarPath;
 
         $user->update($validated);
 
@@ -152,5 +166,36 @@ class ProfileController extends Controller
         );
 
         return back()->with('success', "Status akun \"{$targetUser->name}\" berhasil diperbarui.");
+    }
+
+    private function handleAvatarUpload(Request $request): ?string
+    {
+        if (!$request->hasFile('avatar') || !$request->file('avatar')->isValid()) {
+            return null;
+        }
+
+        $uploadDir = public_path('uploads/avatars');
+        if (!File::isDirectory($uploadDir)) {
+            File::makeDirectory($uploadDir, 0755, true);
+        }
+
+        $file = $request->file('avatar');
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $filename = 'avatar_' . Auth::id() . '_' . date('Ymd_His') . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
+        $file->move($uploadDir, $filename);
+
+        return 'uploads/avatars/' . $filename;
+    }
+
+    private function deleteAvatarFile(?string $avatarPath): void
+    {
+        if (empty($avatarPath) || !str_starts_with($avatarPath, 'uploads/avatars/')) {
+            return;
+        }
+
+        $fullPath = public_path($avatarPath);
+        if (File::exists($fullPath)) {
+            File::delete($fullPath);
+        }
     }
 }

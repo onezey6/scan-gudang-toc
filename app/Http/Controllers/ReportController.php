@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccessLog;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\StockMovement;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
@@ -162,5 +164,25 @@ class ReportController extends Controller
         }, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    public function destroy(StockMovement $movement, Request $request)
+    {
+        $admin = Auth::user();
+        abort_unless($admin && $admin->isAdmin(), 403, 'Hanya Admin yang dapat menghapus catatan riwayat transaksi scan barcode.');
+
+        $refNo = $movement->reference_no;
+        $itemName = $movement->item?->name ?? 'Barang #' . $movement->item_id;
+
+        $movement->delete();
+
+        AccessLog::record(
+            'activity',
+            "Menghapus riwayat transaksi scan barcode ({$refNo} - {$itemName}) dari laporan",
+            $admin,
+            $request
+        );
+
+        return back()->with('success', "Catatan transaksi scan {$refNo} berhasil dihapus dari laporan.");
     }
 }

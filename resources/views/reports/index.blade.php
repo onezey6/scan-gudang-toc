@@ -102,6 +102,7 @@
                         <th class="py-3.5 px-4">Status & Jumlah</th>
                         <th class="py-3.5 px-4">Sumber / Tujuan & Partner</th>
                         <th class="py-3.5 px-4">Petugas Scan & Pembuat Barang</th>
+                        <th class="py-3.5 px-4 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200/80 text-sm">
@@ -122,7 +123,12 @@
                                         </button>
                                     @endif
                                     <div>
-                                        <div class="font-bold text-slate-900">{{ $m->item?->name ?? '-' }}</div>
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="font-bold text-slate-900">{{ $m->item?->name ?? 'Barang #' . $m->item_id }}</span>
+                                            @if ($m->item && method_exists($m->item, 'trashed') && $m->item->trashed())
+                                                <span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-300">Tong Sampah</span>
+                                            @endif
+                                        </div>
                                         <div class="text-xs font-mono-code text-emerald-700 mt-0.5">
                                             Barcode: {{ $m->item?->barcode ?? '-' }} ({{ $m->item?->item_code ?? '-' }})
                                         </div>
@@ -134,15 +140,15 @@
                             <td class="py-3.5 px-4 align-top">
                                 @if ($m->movement_type === 'in')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        MASUK +{{ $m->quantity }} {{ $m->item?->unit }}
+                                        MASUK +{{ $m->quantity }} {{ $m->item?->unit ?? 'Unit' }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        KELUAR -{{ $m->quantity }} {{ $m->item?->unit }}
+                                        KELUAR -{{ $m->quantity }} {{ $m->item?->unit ?? 'Unit' }}
                                     </span>
                                 @endif
                                 <div class="text-xs text-slate-600 mt-1">
-                                    Stok: {{ $m->stock_before }} &rarr; <strong class="text-slate-900">{{ $m->stock_after }} {{ $m->item?->unit }}</strong>
+                                    Stok: {{ $m->stock_before }} &rarr; <strong class="text-slate-900">{{ $m->stock_after }} {{ $m->item?->unit ?? 'Unit' }}</strong>
                                 </div>
                             </td>
 
@@ -164,10 +170,30 @@
                                     <span class="font-medium text-slate-700">{{ $m->item?->creator?->name ?? 'Admin' }}</span>
                                 </div>
                             </td>
+
+                            <td class="py-3.5 px-4 align-top text-right">
+                                @if (auth()->user()?->isAdmin())
+                                    <form action="{{ route('reports.destroy', $m) }}" method="POST"
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus data riwayat transaksi scan {{ $m->reference_no }} ini? Tindakan ini tidak dapat dibatalkan.');"
+                                          class="inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                title="Hapus data riwayat scan ini"
+                                                class="p-2 rounded-xl text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-all duration-200 shadow-2xs cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-slate-400">-</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-10 text-center text-sm text-slate-500">
+                            <td colspan="6" class="py-10 text-center text-sm text-slate-500">
                                 Tidak ada data transaksi barang masuk/keluar pada rentang filter ini.
                             </td>
                         </tr>

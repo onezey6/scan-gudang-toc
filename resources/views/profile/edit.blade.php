@@ -12,9 +12,13 @@
             <div class="relative overflow-hidden bg-gradient-to-br from-[#0B1120] via-[#0F172A] to-emerald-950 text-white p-5 sm:p-6 rounded-3xl shadow-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                 <div class="pointer-events-none absolute -right-12 -top-12 w-48 h-48 rounded-full bg-emerald-500/15 blur-2xl"></div>
                 <div class="relative z-10 flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-xl font-extrabold shadow-lg ring-2 ring-white/20">
-                        {{ strtoupper(substr($user->name, 0, 2)) }}
-                    </div>
+                    @if ($user->avatar_url)
+                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-2xl object-cover shadow-lg ring-2 ring-emerald-400">
+                    @else
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-xl font-extrabold shadow-lg ring-2 ring-white/20">
+                            {{ strtoupper(substr($user->name, 0, 2)) }}
+                        </div>
+                    @endif
                     <div>
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                             ID CARD PETUGAS LOGISTIK RESMI
@@ -47,9 +51,41 @@
                     <p class="text-xs text-slate-500">Data ini otomatis digunakan saat Anda menambahkan barang, scan barcode, dan membuat Berita Acara</p>
                 </div>
 
-                <form action="{{ route('profile.update') }}" method="POST" class="p-5 space-y-4">
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
                     @csrf
                     @method('PUT')
+
+                    <!-- Upload Foto Profil -->
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row items-center gap-4">
+                        <div class="relative shrink-0">
+                            @if ($user->avatar_url)
+                                <img id="profile-avatar-preview" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-500 shadow-sm">
+                            @else
+                                <div id="profile-avatar-fallback" class="w-16 h-16 rounded-2xl bg-slate-800 text-emerald-400 border-2 border-slate-700 flex items-center justify-center text-lg font-black shadow-sm">
+                                    {{ strtoupper(substr($user->name, 0, 2)) }}
+                                </div>
+                                <img id="profile-avatar-preview" src="" alt="Preview" class="hidden w-16 h-16 rounded-2xl object-cover border-2 border-emerald-500 shadow-sm">
+                            @endif
+                        </div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Foto Profil Akun Petugas</label>
+                            <p class="text-xs text-slate-500 mb-2.5">Unggah foto profil Anda (Format: JPG, PNG, WEBP, Maks: 3MB). Foto akan tampil di navbar atas, profil samping, dan kartu ID.</p>
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
+                                <label class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer transition-all inline-flex items-center gap-1.5 shadow-xs">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <span>Pilih Foto Baru</span>
+                                    <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden" onchange="previewAvatar(this)">
+                                </label>
+                                @if ($user->avatar)
+                                    <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 cursor-pointer">
+                                        <input type="checkbox" name="remove_avatar" value="1" class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                                        <span>Hapus Foto Profil</span>
+                                    </label>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Lengkap *</label>
@@ -229,4 +265,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('profile-avatar-preview');
+                    var fallback = document.getElementById('profile-avatar-fallback');
+                    if (fallback) fallback.classList.add('hidden');
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 @endsection

@@ -31,6 +31,19 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'avatar_url',
+    ];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!empty($this->avatar)) {
+            return asset($this->avatar);
+        }
+
+        return null;
+    }
+
     protected function casts(): array
     {
         return [

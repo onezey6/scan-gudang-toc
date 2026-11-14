@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AccessLog;
 use App\Models\HandoverDocument;
 use App\Models\Item;
+use App\Models\StockMovement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -336,5 +337,63 @@ class LogisticsFlowTest extends TestCase
         $resStaff = $this->get('/access-logs');
         $resStaff->assertStatus(200);
         $resStaff->assertDontSee('📍 Buka Google Maps');
+    }
+
+    public function test_admin_can_delete_stock_movement_report_and_trashed_item_is_synced(): void
+    {
+        $admin = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($admin);
+
+        // Buat item dan gerakannya
+        $item = Item::firstOrFail();
+        $movement = StockMovement::create([
+            'reference_no' => 'SCN-TEST-DEL-001',
+            'item_id' => $item->id,
+            'user_id' => $admin->id,
+            'movement_type' => 'in',
+            'quantity' => 5,
+            'stock_before' => 10,
+            'stock_after' => 15,
+            'source_destination' => 'Test Source',
+            'partner_name' => 'Test Partner',
+            'scan_method' => 'manual',
+            'notes' => 'Test note',
+            'scanned_at' => now(),
+        ]);
+
+        // Hapus item (soft-delete)
+        $item->delete();
+
+        // Pastikan laporan tetap membaca nama item dan tidak null/strip
+        $reportRes = $this->get('/reports');
+        $reportRes->assertStatus(200);
+        $reportRes->assertSee($item->name);
+        $reportRes->assertSee('Tong Sampah');
+
+        // Admin menghapus log laporan
+        $delRes = $this->delete('/reports/' . $movement->id);
+        $delRes->assertRedirect();
+        $this->assertDatabaseMissing('stock_movements', ['id' => $movement->id]);
+    }
+
+    public function test_user_can_upload_profile_avatar(): void
+    {
+        $user = User::where('email', 'admin@logiscan.id')->firstOrFail();
+        $this->actingAs($user);
+
+        $fakeImage = UploadedFile::fake()->image('my-photo.jpg', 200, 200);
+
+        $res = $this->put('/profile', [
+            'name' => $user->name,
+            'username' => $user->username,
+            'email' => $user->email,
+            'avatar' => $fakeImage,
+        ]);
+
+        $res->assertRedirect();
+        $user->refresh();
+        $this->assertNotNull($user->avatar);
+        $this->assertStringContainsString('uploads/avatars/', $user->avatar);
+        $this->assertNotNull($user->avatar_url);
     }
 }
