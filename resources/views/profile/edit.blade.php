@@ -200,6 +200,19 @@
 
                     <form action="{{ route('profile.users.store') }}" method="POST" class="p-4 sm:p-5 space-y-3 border-b border-slate-200">
                         @csrf
+                        <datalist id="jabatan-presets">
+                            <option value="Kepala Seksi Logistik (Kasilog)">
+                            <option value="Kepala Urusan Logistik (Kaur Logistik)">
+                            <option value="Bintara Administrasi Logistik (Bamin Logistik)">
+                            <option value="Operator Scanner & Barcode TOC">
+                            <option value="Pengelola Gudang Senjata & Amunisi">
+                            <option value="Pengelola Gudang Perlengkapan & Kaporlap">
+                            <option value="Petugas Pemeriksa & Pemeliharaan Materiil">
+                            <option value="Operator Piket Siaga Logistik 24 Jam">
+                            <option value="Staff Administrasi Pergudangan">
+                            <option value="Petugas Penerimaan & Pengeluaran Barang">
+                        </datalist>
+
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Nama Lengkap *</label>
@@ -228,8 +241,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Jabatan</label>
-                                <input type="text" name="job_title" value="Petugas Gudang Logistik" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Jabatan Kedinasan *</label>
+                                <input type="text" name="job_title" list="jabatan-presets" value="Petugas Gudang Logistik" required placeholder="Pilih atau ketik jabatan..." class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                         </div>
                         <button type="submit" class="w-full py-2 rounded-xl {{ $user->isSuperAdmin() ? 'bg-purple-700 hover:bg-purple-800' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white text-xs font-semibold shadow-xs transition-colors">
@@ -261,12 +274,47 @@
                                             <span class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-blue-100 text-blue-800 border border-blue-200">Anda</span>
                                         @endif
                                     </div>
-                                    <div class="text-[11px] text-slate-500 truncate">{{ $u->email }} • {{ $u->job_title }}</div>
+
+                                    <!-- Jabatan & Departemen Highlight -->
+                                    <div class="mt-1 flex items-center gap-1.5 flex-wrap">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-900 border border-purple-200 text-[10px] font-bold">
+                                            <span>🏷️</span>
+                                            <span>{{ $u->job_title ?: 'Belum diatur' }}</span>
+                                        </span>
+                                        @if ($u->department)
+                                            <span class="text-[10px] text-slate-500 font-medium">({{ $u->department }})</span>
+                                        @endif
+                                        @if ($u->employee_id)
+                                            <span class="text-[10px] text-slate-400 font-mono">NRP: {{ $u->employee_id }}</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ $u->email }}</div>
                                     <div class="text-[11px] text-emerald-700 font-medium mt-0.5">
                                         Tambah Barang: <strong>{{ $u->created_items_count }}</strong> • Scan: <strong>{{ $u->stock_movements_count }}x</strong> • BAST/BAP: <strong>{{ $u->handover_documents_count }}</strong>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 shrink-0">
+                                    {{-- Tombol EDIT JABATAN & DATA: UNTUK SUPER ADMIN / ADMIN --}}
+                                    @if ($user->isSuperAdmin() || ($user->isAdmin() && !$u->isSuperAdmin()))
+                                        <button type="button" onclick="openEditUserModal({{ json_encode([
+                                            'id' => $u->id,
+                                            'name' => $u->name,
+                                            'username' => $u->username,
+                                            'email' => $u->email,
+                                            'employee_id' => $u->employee_id,
+                                            'role' => $u->role,
+                                            'job_title' => $u->job_title,
+                                            'department' => $u->department,
+                                            'phone' => $u->phone,
+                                            'update_url' => route('profile.users.update', $u),
+                                        ]) }})" class="p-1.5 rounded-lg text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 border border-amber-200 transition-colors" title="Atur Jabatan & Edit Data Pengguna">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                            </svg>
+                                        </button>
+                                    @endif
+
                                     @if ($u->id !== $user->id && (!$u->isSuperAdmin() || $user->isSuperAdmin()))
                                         <form action="{{ route('profile.users.toggle', $u) }}" method="POST">
                                             @csrf
@@ -445,5 +493,121 @@
                 feedback.innerHTML = '⚠ Terjadi kesalahan jaringan saat menghubungi server.';
             });
         }
+
+        function openEditUserModal(userData) {
+            document.getElementById('form-edit-user').action = userData.update_url;
+            document.getElementById('edit-user-name').value = userData.name || '';
+            document.getElementById('edit-user-username').value = userData.username || '';
+            document.getElementById('edit-user-email').value = userData.email || '';
+            document.getElementById('edit-user-employee-id').value = userData.employee_id || '';
+            document.getElementById('edit-user-job-title').value = userData.job_title || '';
+            document.getElementById('edit-user-department').value = userData.department || '';
+            document.getElementById('edit-user-phone').value = userData.phone || '';
+
+            var roleSelect = document.getElementById('edit-user-role');
+            if (roleSelect) {
+                roleSelect.value = userData.role || 'staff';
+            }
+
+            var modal = document.getElementById('modal-edit-user');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditUserModal() {
+            var modal = document.getElementById('modal-edit-user');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+    </script>
+
+    <!-- Modal Atur Jabatan & Edit Pengguna -->
+    <div id="modal-edit-user" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-xs items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden my-8">
+            <div class="p-4 sm:p-5 bg-gradient-to-r from-[#0F172A] via-slate-900 to-purple-950 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/40 text-purple-300 flex items-center justify-center font-bold text-sm">
+                        ✏️
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold">Atur Jabatan & Data Pengguna</h3>
+                        <p class="text-[11px] text-slate-300">Penetapan struktur organisasi kedinasan & hak akses</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditUserModal()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm cursor-pointer">✕</button>
+            </div>
+
+            <form id="form-edit-user" method="POST" action="" class="p-5 space-y-3.5">
+                @csrf
+                @method('PUT')
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">Nama Lengkap *</label>
+                        <input type="text" name="name" id="edit-user-name" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">Username *</label>
+                        <input type="text" name="username" id="edit-user-username" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">Email *</label>
+                        <input type="email" name="email" id="edit-user-email" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">NIP / NRP</label>
+                        <input type="text" name="employee_id" id="edit-user-employee-id" placeholder="NRP-8809..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+                    
+                    <!-- Jabatan Kedinasan (Highlight) -->
+                    <div class="sm:col-span-2 p-3 rounded-2xl bg-purple-50/70 border border-purple-200">
+                        <label class="block font-bold uppercase text-purple-900 mb-1 flex items-center justify-between">
+                            <span>🏷️ Jabatan Kedinasan *</span>
+                            <span class="text-[10px] text-purple-600 font-normal">Pilih rekomendasi atau ketik bebas</span>
+                        </label>
+                        <input type="text" name="job_title" id="edit-user-job-title" list="jabatan-presets" required placeholder="Pilih atau ketik jabatan..."
+                               class="w-full px-3.5 py-2 rounded-xl border border-purple-300 bg-white font-semibold text-slate-800 text-xs focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">Divisi / Satuan</label>
+                        <input type="text" name="department" id="edit-user-department" placeholder="Detasemen Gegana..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">Nomor HP / WhatsApp</label>
+                        <input type="text" name="phone" id="edit-user-phone" placeholder="0812-..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block font-semibold uppercase text-slate-600 mb-1">Peran Akses Sistem (Role) *</label>
+                        <select name="role" id="edit-user-role" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <option value="staff">Petugas / Staff (Operator Gudang)</option>
+                            <option value="admin">Admin Logistik (Pengelola Gudang)</option>
+                            @if ($user->isSuperAdmin())
+                                <option value="super_admin">👑 Super Admin (Otoritas Tertinggi)</option>
+                            @endif
+                        </select>
+                    </div>
+
+                    <div class="sm:col-span-2 pt-2 border-t border-slate-200">
+                        <label class="block font-semibold uppercase text-slate-600 mb-0.5">Ubah Password Pengguna (Opsional)</label>
+                        <p class="text-[11px] text-slate-400 mb-1.5">Kosongkan jika tidak ingin mengubah password akun.</p>
+                        <input type="password" name="password" placeholder="Masukkan password baru (minimal 6 karakter)" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 focus:outline-none text-xs">
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="closeEditUserModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-1.5 cursor-pointer">
+                        <span>Simpan Perubahan Jabatan</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     </script>
 @endsection

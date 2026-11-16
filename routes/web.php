@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::post('/profile/users', [ProfileController::class, 'storeUser'])->name('profile.users.store');
+    Route::put('/profile/users/{targetUser}', [ProfileController::class, 'updateUser'])->name('profile.users.update');
     Route::patch('/profile/users/{targetUser}/toggle', [ProfileController::class, 'toggleUser'])->name('profile.users.toggle');
     Route::delete('/profile/users/{targetUser}', [ProfileController::class, 'destroyUser'])->name('profile.users.destroy');
 

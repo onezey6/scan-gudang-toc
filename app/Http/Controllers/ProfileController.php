@@ -146,6 +146,76 @@ class ProfileController extends Controller
         return back()->with('success', "Akun pengguna \"{$newUser->name}\" berhasil dibuat.");
     }
 
+    public function updateUser(Request $request, User $targetUser)
+    {
+        $admin = Auth::user();
+        abort_unless($admin && $admin->isAdmin(), 403, 'Akses ditolak: Hanya Administrator atau Super Admin yang dapat mengubah data pengguna.');
+
+        // Admin biasa tidak boleh mengedit akun Super Admin
+        if ($targetUser->isSuperAdmin() && !$admin->isSuperAdmin()) {
+            abort(403, 'Admin biasa tidak memiliki wewenang untuk mengubah data akun Super Admin.');
+        }
+
+        $allowedRoles = $admin->isSuperAdmin() ? ['super_admin', 'admin', 'staff'] : ['admin', 'staff'];
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'username' => ['required', 'string', 'max:100', 'unique:users,username,' . $targetUser->id],
+            'email' => ['required', 'email', 'max:150', 'unique:users,email,' . $targetUser->id],
+            'employee_id' => ['nullable', 'string', 'max:60'],
+            'role' => ['required', 'in:' . implode(',', $allowedRoles)],
+            'job_title' => ['required', 'string', 'max:120'],
+            'department' => ['nullable', 'string', 'max:120'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'password' => ['nullable', 'string', 'min:6'],
+        ], [
+            'name.required' => 'Nama pengguna wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
+            'username.unique' => 'Username tersebut sudah digunakan pengguna lain.',
+            'email.required' => 'Email wajib diisi.',
+            'email.unique' => 'Email tersebut sudah digunakan pengguna lain.',
+            'job_title.required' => 'Jabatan pengguna wajib diisi.',
+        ]);
+
+        // Cek jika Super Admin terakhir mencoba menurunkan role-nya sendiri
+        if ($targetUser->isSuperAdmin() && $validated['role'] !== 'super_admin') {
+            $otherSuperAdminsCount = User::where('role', 'super_admin')
+                ->where('id', '!=', $targetUser->id)
+                ->count();
+
+            if ($otherSuperAdminsCount < 1) {
+                return back()->withErrors(['role' => 'Tidak dapat menurunkan role Super Admin terakhir pada sistem.']);
+            }
+        }
+
+        $updateData = [
+            'name' => $validated['name'],
+            'username' => trim($validated['username']),
+            'email' => trim($validated['email']),
+            'employee_id' => $validated['employee_id'] ?? null,
+            'role' => $validated['role'],
+            'job_title' => trim($validated['job_title']),
+            'department' => $validated['department'] ? trim($validated['department']) : 'Divisi Logistik',
+            'phone' => $validated['phone'] ?? null,
+        ];
+
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $oldJobTitle = $targetUser->job_title;
+        $targetUser->update($updateData);
+
+        AccessLog::record(
+            'activity',
+            "Administrator ({$admin->name}) memperbarui data pengguna: {$targetUser->name} (Jabatan: '{$oldJobTitle}' -> '{$targetUser->job_title}', Role: " . strtoupper($targetUser->role) . ")",
+            $admin,
+            $request
+        );
+
+        return back()->with('success', "Data dan jabatan pengguna \"{$targetUser->name}\" berhasil diperbarui.");
+    }
+
     public function toggleUser(Request $request, User $targetUser)
     {
         $admin = Auth::user();

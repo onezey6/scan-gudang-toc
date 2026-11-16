@@ -623,4 +623,38 @@ class LogisticsFlowTest extends TestCase
             'event_type' => 'brute_force_blocked',
         ]);
     }
+
+    public function test_super_admin_can_update_user_job_title_and_role(): void
+    {
+        $superAdmin = User::where('role', 'super_admin')->firstOrFail();
+        $targetUser = User::where('role', 'staff')->firstOrFail();
+
+        $this->actingAs($superAdmin);
+
+        $response = $this->put(route('profile.users.update', $targetUser), [
+            'name' => $targetUser->name,
+            'username' => $targetUser->username,
+            'email' => $targetUser->email,
+            'employee_id' => 'NRP-88091122',
+            'job_title' => 'Kepala Seksi Logistik (Kasilog)',
+            'department' => 'Detasemen Gegana Satbrimob',
+            'role' => 'admin',
+            'phone' => '0812-9988-7766',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $targetUser->refresh();
+        $this->assertEquals('Kepala Seksi Logistik (Kasilog)', $targetUser->job_title);
+        $this->assertEquals('Detasemen Gegana Satbrimob', $targetUser->department);
+        $this->assertEquals('admin', $targetUser->role);
+        $this->assertEquals('NRP-88091122', $targetUser->employee_id);
+
+        // Verifikasi audit log
+        $this->assertDatabaseHas('access_logs', [
+            'user_id' => $superAdmin->id,
+            'event_type' => 'activity',
+        ]);
+    }
 }
