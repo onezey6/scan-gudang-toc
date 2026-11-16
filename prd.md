@@ -39,6 +39,12 @@ Sistem mendukung **3 tingkatan peran pengguna (Role-Based Access Control / RBAC)
     1. **Kamera HP / Webcam Laptop** langsung dari browser (`html5-qrcode`).
     2. **Alat Scanner Fisik (USB / Bluetooth HID)** dengan pendeteksi input otomatis cepat + opsi ketik kode manual.
   - **Digital Signature Pad:** Kanvas tanda tangan langsung di layar sentuh HP atau mouse PC untuk dokumen BAST & BAP.
+  - **Integrasi Bot Telegram Logistik (LogiScan Bot):**
+    1. Pencarian instan stok fisik dan lokasi rak via chat Telegram berdasarkan nama barang, barcode, atau SKU (`/stok`, `/cari`, atau ketik kata kunci langsung).
+    2. Notifikasi transaksi scan gudang (Inbound/Outbound) secara otomatis ke grup dinas atau chat pribadi Komandan.
+    3. Radar pengingat otomatis dokumen BAST yang melewati jatuh tempo (`/bast`).
+    4. Rekapitulasi pergerakan mutasi harian (`/rekap`).
+    5. Dukungan Dual-Mode: Polling lokal (`php artisan telegram:poll`) untuk XAMPP/intranet & Webhook HTTPS untuk server online.
 
 ---
 

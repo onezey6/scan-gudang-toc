@@ -322,6 +322,53 @@
                             <span>Unduh Backup (.SQL)</span>
                         </a>
                     </div>
+                <!-- Kartu Integrasi Bot Telegram Logistik -->
+                <div class="bg-gradient-to-br from-[#071324] to-[#0F1E36] text-white rounded-2xl border-2 border-cyan-500/40 p-5 shadow-lg relative overflow-hidden">
+                    <div class="pointer-events-none absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-cyan-500/15 blur-xl"></div>
+                    <div class="flex items-center justify-between gap-3 flex-wrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shrink-0 text-xl">
+                                🤖
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="text-sm font-extrabold uppercase tracking-wide text-white">Bot Telegram LogiScan</h4>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold {{ config('services.telegram.bot_token') ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700' }}">
+                                        {{ config('services.telegram.bot_token') ? 'TERHUBUNG' : 'BELUM AKTIF' }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-300 mt-0.5">Notifikasi otomatis mutasi scan, radar BAST jatuh tempo, dan pencarian stok via chat HP.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3.5 pt-3 border-t border-slate-700/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">STATUS TOKEN BOT:</span>
+                            <strong class="{{ config('services.telegram.bot_token') ? 'text-emerald-400' : 'text-slate-500' }}">
+                                {{ config('services.telegram.bot_token') ? '✓ Terpasang di .env' : 'Belum diisi di .env' }}
+                            </strong>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">CHAT ID TUJUAN:</span>
+                            <strong class="{{ config('services.telegram.chat_id') ? 'text-cyan-400' : 'text-slate-500' }}">
+                                {{ config('services.telegram.chat_id') ?: 'Belum diisi di .env' }}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="mt-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                            <span>Listener Lokal: <code>php artisan telegram:poll</code></span>
+                        </div>
+                        <button type="button" onclick="testTelegramConnection()" id="btn-test-telegram"
+                                class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer">
+                            <span>Tes Kirim Pesan ke Telegram</span>
+                        </button>
+                    </div>
+
+                    <div id="telegram-test-feedback" class="hidden mt-3 p-2.5 rounded-xl text-xs font-mono"></div>
                 </div>
             @endif
 
@@ -360,6 +407,43 @@
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+        function testTelegramConnection() {
+            var btn = document.getElementById('btn-test-telegram');
+            var feedback = document.getElementById('telegram-test-feedback');
+            btn.disabled = true;
+            btn.innerHTML = 'Mengirim...';
+            feedback.className = 'hidden';
+
+            fetch('{{ route('telegram.test') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = 'Tes Kirim Pesan ke Telegram';
+                feedback.classList.remove('hidden');
+                if (data.success) {
+                    feedback.className = 'mt-3 p-3 rounded-xl text-xs font-mono bg-emerald-950/80 border border-emerald-500/50 text-emerald-300';
+                    feedback.innerHTML = '✓ ' + data.message;
+                } else {
+                    feedback.className = 'mt-3 p-3 rounded-xl text-xs font-mono bg-rose-950/80 border border-rose-500/50 text-rose-300';
+                    feedback.innerHTML = '⚠ ' + data.message;
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = 'Tes Kirim Pesan ke Telegram';
+                feedback.classList.remove('hidden');
+                feedback.className = 'mt-3 p-3 rounded-xl text-xs font-mono bg-rose-950/80 border border-rose-500/50 text-rose-300';
+                feedback.innerHTML = '⚠ Terjadi kesalahan jaringan saat menghubungi server.';
+            });
         }
     </script>
 @endsection

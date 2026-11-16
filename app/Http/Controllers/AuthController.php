@@ -44,6 +44,22 @@ class AuthController extends Controller
                 $loginValue
             );
 
+            // Kirim Notifikasi Darurat ke Telegram Bot (Jika Terkonfigurasi)
+            try {
+                $telegram = app(\App\Services\TelegramService::class);
+                if ($telegram->isConfigured()) {
+                    $alertMsg = "🚨 <b>PERINGATAN KEAMANAN (BRUTE FORCE BLOCKED)</b>\n";
+                    $alertMsg .= "━━━━━━━━━━━━━━━━━━━━\n";
+                    $alertMsg .= "Terdeteksi serangan tebak password massal di sistem LogiScan Pro!\n\n";
+                    $alertMsg .= "🎯 Target Akun: <code>" . e($loginValue) . "</code>\n";
+                    $alertMsg .= "🌐 Alamat IP Penyerang: <code>" . e($request->ip()) . "</code>\n";
+                    $alertMsg .= "🛡️ Status: <b>Akses Login Diblokir Sementara ({$seconds}s)</b>\n";
+                    $alertMsg .= "⏰ Jam Kejadian: " . now()->format('H:i:s') . " WIB";
+
+                    $telegram->sendNotification($alertMsg);
+                }
+            } catch (\Throwable $e) {}
+
             return back()
                 ->withInput($request->only('login'))
                 ->withErrors(['login' => "Terlalu banyak percobaan login gagal. Demi keamanan sistem, silakan tunggu {$seconds} detik sebelum mencoba lagi."]);

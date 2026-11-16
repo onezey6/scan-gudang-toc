@@ -10,6 +10,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\TrashController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,9 @@ Route::get('/manifest.json', function () {
         'Content-Type' => 'application/manifest+json; charset=utf-8',
     ]);
 });
+
+// Webhook Telegram (Publik / Tanpa Auth Middleware)
+Route::post('/api/telegram/webhook', [TelegramWebhookController::class, 'handle'])->name('telegram.webhook');
 
 // Guest / Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -99,4 +103,7 @@ Route::middleware('auth')->group(function () {
 
     // Pencadangan Database (Admin Only)
     Route::get('/settings/backup-database', [BackupController::class, 'download'])->name('settings.backup-db');
+
+    // Pengujian Koneksi Telegram Bot
+    Route::post('/telegram/test', [TelegramWebhookController::class, 'sendTest'])->name('telegram.test');
 });

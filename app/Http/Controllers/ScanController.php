@@ -216,6 +216,29 @@ class ScanController extends Controller
         $item = $result['item'];
         $typeLabel = $movement->movement_type === 'in' ? 'Barang Masuk' : 'Barang Keluar';
 
+        // Kirim Notifikasi Real-time ke Telegram Bot (Jika Terkonfigurasi)
+        try {
+            $telegram = app(\App\Services\TelegramService::class);
+            if ($telegram->isConfigured()) {
+                $typeIcon = $movement->movement_type === 'in' ? '📥 [SCAN MASUK]' : '📤 [SCAN KELUAR]';
+                $sign = $movement->movement_type === 'in' ? '+' : '-';
+                $notif = "<b>{$typeIcon} TRANSAKSI GUDANG</b>\n";
+                $notif .= "━━━━━━━━━━━━━━━━━━━━\n";
+                $notif .= "📦 <b>" . e($item->name) . "</b>\n";
+                $notif .= "🏷️ Barcode: <code>" . e($item->barcode) . "</code>\n";
+                $notif .= "🔄 Mutasi: <b>{$sign}{$movement->quantity} " . e($item->unit) . "</b>\n";
+                $notif .= "📊 Sisa Stok Gudang: <b>" . number_format($item->stock) . " " . e($item->unit) . "</b>\n";
+                $notif .= "📍 Lokasi Rak: <b>" . e($item->storage_location ?: 'Gudang Utama') . "</b>\n";
+                $notif .= "👤 Petugas Scan: " . e($user->name) . " (" . strtoupper($user->role) . ")\n";
+                $notif .= "📝 Ref: <code>{$movement->reference_no}</code>\n";
+                $notif .= "⏰ Waktu: " . now()->format('H:i') . " WIB";
+
+                $telegram->sendNotification($notif);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Gagal kirim notifikasi Telegram: " . $e->getMessage());
+        }
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
