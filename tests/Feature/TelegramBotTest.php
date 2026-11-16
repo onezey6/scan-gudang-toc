@@ -101,6 +101,35 @@ class TelegramBotTest extends TestCase
             'from' => ['first_name' => 'Budi'],
         ]);
         $this->assertTrue($searchHandled);
+
+        // Test Tombol Menu Pilihan
+        $btnQuick = $service->handleIncomingMessage([
+            'chat' => ['id' => 123456],
+            'text' => '🔍 Cari Barang Cepat',
+            'from' => ['first_name' => 'Budi'],
+        ]);
+        $this->assertTrue($btnQuick);
+
+        $btnTop = $service->handleIncomingMessage([
+            'chat' => ['id' => 123456],
+            'text' => '📦 5 Barang Teratas',
+            'from' => ['first_name' => 'Budi'],
+        ]);
+        $this->assertTrue($btnTop);
+
+        $btnBast = $service->handleIncomingMessage([
+            'chat' => ['id' => 123456],
+            'text' => '🚨 Radar BAST Terlambat',
+            'from' => ['first_name' => 'Budi'],
+        ]);
+        $this->assertTrue($btnBast);
+
+        $btnRekap = $service->handleIncomingMessage([
+            'chat' => ['id' => 123456],
+            'text' => '📊 Rekap Scan Hari Ini',
+            'from' => ['first_name' => 'Budi'],
+        ]);
+        $this->assertTrue($btnRekap);
     }
 
     public function test_telegram_webhook_endpoint_returns_200_ok(): void
@@ -135,7 +164,13 @@ class TelegramBotTest extends TestCase
         $admin = User::where('role', 'super_admin')->firstOrFail();
         $this->actingAs($admin);
 
-        config(['services.telegram.bot_token' => null]);
+        $unconfiguredService = new class extends TelegramService {
+            public function isConfigured(): bool
+            {
+                return false;
+            }
+        };
+        $this->app->instance(TelegramService::class, $unconfiguredService);
 
         $response = $this->postJson(route('telegram.test'), []);
         $response->assertStatus(422);
