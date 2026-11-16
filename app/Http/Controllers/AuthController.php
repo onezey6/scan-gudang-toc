@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -30,11 +32,30 @@ class AuthController extends Controller
         ]);
 
         $loginValue = trim($credentials['login']);
+        $throttleKey = Str::transliterate(Str::lower($loginValue) . '|' . $request->ip());
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            AccessLog::record(
+                'brute_force_blocked',
+                "Percobaan login diblokir sementara (Proteksi Anti Brute-Force) untuk: {$loginValue}. Sisa waktu: {$seconds} detik.",
+                null,
+                $request,
+                $loginValue
+            );
+
+            return back()
+                ->withInput($request->only('login'))
+                ->withErrors(['login' => "Terlalu banyak percobaan login gagal. Demi keamanan sistem, silakan tunggu {$seconds} detik sebelum mencoba lagi."]);
+        }
+
         $user = User::where('email', $loginValue)
             ->orWhere('username', $loginValue)
             ->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            RateLimiter::hit($throttleKey, 60);
+
             AccessLog::record(
                 'failed_login',
                 "Percobaan login gagal untuk akun: {$loginValue}",
@@ -49,6 +70,8 @@ class AuthController extends Controller
         }
 
         if (!$user->is_active) {
+            RateLimiter::hit($throttleKey, 60);
+
             AccessLog::record(
                 'failed_login',
                 "Percobaan login ditolak karena akun nonaktif: {$user->email}",
@@ -62,6 +85,7 @@ class AuthController extends Controller
                 ->withErrors(['login' => 'Akun Anda sedang dinonaktifkan oleh Administrator.']);
         }
 
+        RateLimiter::clear($throttleKey);
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 

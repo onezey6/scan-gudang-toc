@@ -1,9 +1,16 @@
-# STATUS REVISI: BERSIH & SIAP OPERASIONAL
+# STATUS REVISI: SELESAI & SUDAH DITERAPKAN (BERSIH)
 
-Pembaruan antarmuka taktis ditunda sesuai keputusan pengguna. Seluruh sistem berjalan pada konfigurasi stabil terakhir:
-- Sistem peran 3 tingkat (`super_admin`, `admin`, `staff`) aktif dan terproteksi.
-- Fitur hapus akun eksklusif Super Admin dengan soft-deletes dan audit log berjalan normal.
-- Peningkatan Bento Grid dashboard, tactile micro-spring, haptic feedback, dan mobile quick action hub telah terpasang stabil.
-- 18/18 Automated tests lolos (126 assertions).
+Penerapan Sistem Keamanan Anti Brute-Force & Rate Limiting telah selesai diimplementasikan dan diverifikasi 100% lolos pengujian otomatis:
+1. **`app/Http/Controllers/AuthController.php`**:
+   - Integrasi `RateLimiter` berbasis kombinasi identitas user + alamat IP.
+   - Ambang batas: 5x kegagalan berturut-turut.
+   - Penguncian otomatis selama 60 detik jika terdeteksi serangan tebak password massal.
+   - Pencatatan log keamanan forensik dengan `event_type = 'brute_force_blocked'` ke tabel `access_logs`.
+   - Pembersihan counter saat login berhasil.
+2. **`app/Http/Controllers/ForgotPasswordController.php`**:
+   - Pembatasan frekuensi pengiriman kode OTP reset password maksimal 4 kali per 5 menit untuk mencegah spam bot.
+3. **`tests/Feature/LogisticsFlowTest.php`**:
+   - Uji otomatis `test_login_rate_limiting_blocks_brute_force_attacks` lolos 100%.
+   - Total pengujian: **19 tests passed (140 assertions)**.
 
-Tidak ada revisi atau perubahan yang tertunda.
+Tidak ada revisi tertunda. Sistem dalam status prima, aman, dan siap beroperasi.

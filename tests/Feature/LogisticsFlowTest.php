@@ -594,4 +594,33 @@ class LogisticsFlowTest extends TestCase
         $adminBiasa->forceDelete();
         $staffUser->forceDelete();
     }
+
+    public function test_login_rate_limiting_blocks_brute_force_attacks(): void
+    {
+        $loginTarget = 'admin@logiscan.id';
+
+        // 5 kali percobaan login gagal dengan password salah
+        for ($i = 1; $i <= 5; $i++) {
+            $res = $this->post('/login', [
+                'login' => $loginTarget,
+                'password' => 'wrongpassword' . $i,
+            ]);
+            $res->assertSessionHasErrors('login');
+        }
+
+        // Percobaan ke-6 harus otomatis DIBLOKIR sementara oleh sistem pertahanan Brute-Force
+        $resBlocked = $this->post('/login', [
+            'login' => $loginTarget,
+            'password' => 'wrongpassword6',
+        ]);
+        $resBlocked->assertSessionHasErrors('login');
+        $errorMsg = session('errors')->first('login');
+        $this->assertStringContainsString('Terlalu banyak percobaan login gagal', $errorMsg);
+
+        // Verifikasi tabel access_logs mencatat percobaan brute force yang diblokir
+        $this->assertDatabaseHas('access_logs', [
+            'user_email' => $loginTarget,
+            'event_type' => 'brute_force_blocked',
+        ]);
+    }
 }

@@ -45,9 +45,14 @@ Sistem mendukung **3 tingkatan peran pengguna (Role-Based Access Control / RBAC)
 ## 4. Alur Kerja Aplikasi (End-to-End User Flow)
 
 ### A. Alur Login & History Akses Keluar-Masuk Web (Fitur #4 & #7)
-1. Pengguna membuka aplikasi dan diarahkan ke **Halaman Login** yang modern.
-2. Saat pengguna melakukan **Login**, **Logout**, atau **Gagal Login**, sistem secara otomatis merekam ke tabel `access_logs` (Nama User, Role, Jenis Aktivitas, Alamat IP, Jenis Perangkat/Browser, dan Waktu Kejadian).
-3. Di menu **History Akses Web**, pengguna/admin dapat memantau daftar riwayat keluar-masuk web lengkap dengan filter tanggal, jenis aktivitas (Login / Logout / Aktivitas Penting), dan pencarian nama user.
+1. Pengguna membuka aplikasi dan diarahkan ke **Halaman Login** yang modern dan terproteksi.
+2. **Proteksi Anti Brute-Force (Rate Limiting):**
+   - Sistem membatasi percobaan login maksimal 5 kali berturut-turut per kombinasi akun + IP.
+   - Jika terjadi 5 kegagalan, sistem otomatis mengunci login selama 60 detik dengan hitung mundur detik transparan.
+   - Kejadian pemblokiran brute-force dicatat otomatis ke audit log dengan event `brute_force_blocked`.
+   - Permintaan pengiriman kode OTP reset password dibatasi maksimal 4 kali per 5 menit untuk mencegah bot spam.
+3. Saat pengguna melakukan **Login**, **Logout**, atau **Gagal Login**, sistem secara otomatis merekam ke tabel `access_logs` (Nama User, Role, Jenis Aktivitas, Alamat IP, Jenis Perangkat/Browser, dan Waktu Kejadian).
+4. Di menu **History Akses Web**, pengguna/admin dapat memantau daftar riwayat keluar-masuk web lengkap dengan filter tanggal, jenis aktivitas (Login / Logout / Aktivitas Penting), dan pencarian nama user.
 
 ### B. Alur Tambah Barang & Mode Pembuat Barcode (Fitur #1 & #6)
 1. Petugas/Admin membuka menu **Data Barang & Pembuat Barcode**.

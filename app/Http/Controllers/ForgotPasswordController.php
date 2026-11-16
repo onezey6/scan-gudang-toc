@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 
 class ForgotPasswordController extends Controller
 {
@@ -17,12 +18,22 @@ class ForgotPasswordController extends Controller
 
     public function sendResetCode(Request $request)
     {
+        $throttleKey = 'forgot-password|' . $request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 4)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()
+                ->withInput()
+                ->withErrors(['identity' => "Terlalu banyak permintaan reset kode. Demi keamanan sistem, silakan tunggu {$seconds} detik."]);
+        }
+
         $request->validate([
             'identity' => ['required', 'string'],
             'reset_channel' => ['nullable', 'in:email,phone'],
         ], [
             'identity.required' => 'Email, username, atau nomor HP wajib diisi.',
         ]);
+
+        RateLimiter::hit($throttleKey, 300);
 
         $identity = trim($request->input('identity'));
         $channel = $request->input('reset_channel', 'email');
