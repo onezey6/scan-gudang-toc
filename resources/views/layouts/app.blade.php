@@ -208,16 +208,21 @@
         html.theme-cyber .bg-rose-50, html.theme-cyber .bg-rose-50\/70 { background-color: rgba(244, 63, 94, 0.10) !important; }
         html.theme-cyber .bg-rose-100 { background-color: rgba(244, 63, 94, 0.18) !important; }
         html.theme-cyber .bg-indigo-50 { background-color: rgba(129, 140, 248, 0.12) !important; }
+        html.theme-cyber .bg-purple-50, html.theme-cyber .bg-purple-50\/70, html.theme-cyber .bg-purple-50\/80,
+        html.theme-cyber .bg-purple-100 { background-color: rgba(168, 85, 247, 0.12) !important; }
         html.theme-cyber .bg-blue-50 { background-color: rgba(56, 189, 248, 0.12) !important; }
         html.theme-cyber .bg-cyan-50, html.theme-cyber .bg-cyan-50\/50, html.theme-cyber .bg-cyan-100 { background-color: rgba(6, 182, 212, 0.12) !important; }
         html.theme-cyber .from-emerald-50 { background-image: none !important; background-color: rgba(16, 185, 129, 0.10) !important; }
         html.theme-cyber .from-rose-50 { background-image: none !important; background-color: rgba(244, 63, 94, 0.10) !important; }
+        html.theme-cyber .from-purple-50 { background-image: none !important; background-color: rgba(168, 85, 247, 0.10) !important; }
         html.theme-cyber .from-slate-50 { background-image: none !important; background-color: rgba(34, 211, 238, 0.05) !important; }
 
         /* Hover */
-        html.theme-cyber .hover\:bg-slate-50:hover, html.theme-cyber .hover\:bg-slate-100:hover,
+        html.theme-cyber .hover\:bg-slate-50:hover, html.theme-cyber .hover\:bg-slate-50\/70:hover,
+        html.theme-cyber .hover\:bg-slate-50\/80:hover, html.theme-cyber .hover\:bg-slate-100:hover,
         html.theme-cyber .hover\:bg-slate-200:hover, html.theme-cyber .hover\:bg-emerald-50\/70:hover,
         html.theme-cyber .hover\:bg-emerald-50\/60:hover, html.theme-cyber .hover\:bg-emerald-50\/30:hover,
+        html.theme-cyber .hover\:bg-purple-50\/70:hover, html.theme-cyber .hover\:bg-purple-50:hover,
         html.theme-cyber .hover\:bg-emerald-100:hover { background-color: rgba(34, 211, 238, 0.09) !important; }
         html.theme-cyber tbody tr:hover { background-color: rgba(34, 211, 238, 0.05) !important; }
         html.theme-cyber .hover\:bg-emerald-600:hover { background-color: #0891b2 !important; box-shadow: 0 0 18px rgba(34, 211, 238, 0.45) !important; }
@@ -237,6 +242,8 @@
         html.theme-cyber .text-rose-600, html.theme-cyber .text-rose-700,
         html.theme-cyber .text-rose-800, html.theme-cyber .text-rose-900 { color: #fb7185 !important; }
         html.theme-cyber .text-indigo-600, html.theme-cyber .text-indigo-700 { color: #a5b4fc !important; }
+        html.theme-cyber .text-purple-600, html.theme-cyber .text-purple-700,
+        html.theme-cyber .text-purple-800, html.theme-cyber .text-purple-900 { color: #d8b4fe !important; text-shadow: 0 0 10px rgba(192, 132, 252, 0.25); }
         html.theme-cyber .text-cyan-600, html.theme-cyber .text-cyan-700,
         html.theme-cyber .text-cyan-800 { color: #22d3ee !important; text-shadow: 0 0 10px rgba(34, 211, 238, 0.25); }
         html.theme-cyber .text-blue-600, html.theme-cyber .text-blue-700 { color: #7dd3fc !important; }
@@ -254,7 +261,8 @@
         html.theme-cyber .border-emerald-400 { border-color: rgba(52, 211, 153, 0.38) !important; }
         html.theme-cyber .border-amber-200, html.theme-cyber .border-amber-200\/70 { border-color: rgba(251, 191, 36, 0.35) !important; }
         html.theme-cyber .border-rose-200, html.theme-cyber .border-rose-200\/80 { border-color: rgba(251, 113, 133, 0.35) !important; }
-        html.theme-cyber .border-indigo-200, html.theme-cyber .border-blue-200 { border-color: rgba(129, 140, 248, 0.35) !important; }
+        html.theme-cyber .border-indigo-200, html.theme-cyber .border-blue-200,
+        html.theme-cyber .border-purple-200, html.theme-cyber .border-purple-300 { border-color: rgba(168, 85, 247, 0.35) !important; }
         html.theme-cyber .border-cyan-200, html.theme-cyber .border-cyan-300 { border-color: rgba(34, 211, 238, 0.38) !important; }
         html.theme-cyber .ring-white { --tw-ring-color: #05070D !important; }
 
