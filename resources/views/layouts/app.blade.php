@@ -77,6 +77,36 @@
             box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.75);
             animation: scanLaser 2.4s ease-in-out infinite;
         }
+        /* UI/UX Pro Max: Tactile Micro-Interactions & Shimmer */
+        button, a, input[type="submit"], input[type="button"] {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active, a.active-scale:active, .btn-tactile:active {
+            transform: scale(0.97);
+            transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes shimmerSweep {
+            100% { transform: translateX(100%); }
+        }
+        .shimmer-active {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-active::after {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0,
+                rgba(255, 255, 255, 0.06) 20%,
+                rgba(255, 255, 255, 0.16) 60%,
+                rgba(255, 255, 255, 0)
+            );
+            animation: shimmerSweep 1.8s infinite;
+            content: '';
+        }
         @keyframes radarSweep { to { transform: rotate(360deg); } }
         .radar-sweep {
             background: conic-gradient(from 0deg, rgba(34, 211, 238, 0.35), transparent 28%);
@@ -646,6 +676,46 @@
             </footer>
         </div>
 
+        <!-- Overlay Backdrop for Mobile Quick Hub (UI/UX Pro Max) -->
+        <div id="mobile-quick-hub-backdrop" class="fixed inset-0 z-35 bg-black/60 backdrop-blur-xs hidden transition-opacity" onclick="toggleMobileQuickHub(event)"></div>
+
+        <!-- Floating Quick Action Menu Hub on Mobile (UI/UX Pro Max) -->
+        <div id="mobile-quick-hub" class="no-print lg:hidden fixed bottom-20 inset-x-4 max-w-sm mx-auto bg-slate-950/95 backdrop-blur-xl border border-emerald-500/40 rounded-3xl p-3 shadow-[0_0_35px_rgba(0,0,0,0.85)] z-40 hidden space-y-2.5 transition-all duration-200">
+            <div class="flex items-center justify-between px-2 pb-1.5 border-b border-slate-800 text-[10px] font-bold text-slate-400">
+                <span class="flex items-center gap-1.5 text-emerald-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>AKSI CEPAT TRANSAKSI GUDANG</span>
+                </span>
+                <button type="button" onclick="toggleMobileQuickHub(event)" class="text-slate-400 hover:text-white p-1 text-sm font-bold">&times;</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <a href="{{ route('scan.index', ['mode' => 'in', 'camera' => 1]) }}" class="flex flex-col p-2.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 text-xs font-bold active:scale-95 transition-all shadow-xs">
+                    <div class="flex items-center justify-between text-emerald-400">
+                        <span class="text-base">📥</span>
+                        <span class="text-[9px] font-mono px-1 rounded bg-emerald-500/20 font-bold">+Stok</span>
+                    </div>
+                    <span class="mt-1 text-white text-xs font-extrabold">Scan Masuk</span>
+                </a>
+                <a href="{{ route('scan.index', ['mode' => 'out', 'camera' => 1]) }}" class="flex flex-col p-2.5 rounded-2xl bg-amber-950/50 border border-amber-500/40 text-amber-300 text-xs font-bold active:scale-95 transition-all shadow-xs">
+                    <div class="flex items-center justify-between text-amber-400">
+                        <span class="text-base">📤</span>
+                        <span class="text-[9px] font-mono px-1 rounded bg-amber-500/20 font-bold">-Stok</span>
+                    </div>
+                    <span class="mt-1 text-white text-xs font-extrabold">Scan Keluar</span>
+                </a>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-900">
+                <a href="{{ route('handovers.create', ['type' => 'bast']) }}" class="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-teal-300 text-xs font-semibold active:scale-95 text-center transition-all flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>Buat BAST</span>
+                </a>
+                <a href="{{ route('scan.index', ['camera' => 1]) }}" class="py-2 px-3 rounded-xl bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-200 text-xs font-semibold active:scale-95 text-center transition-all flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>Kamera HP</span>
+                </a>
+            </div>
+        </div>
+
         <!-- MOBILE BOTTOM DOCK (Native App Style with Elevated Center Scan Action) -->
         <nav class="no-print lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0B1120]/95 backdrop-blur-lg border-t border-cyan-500/20 shadow-[0_-8px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-2">
             <div class="grid grid-cols-5 items-end max-w-md mx-auto">
@@ -671,15 +741,15 @@
 
                 <!-- 3. CENTER ELEVATED SCAN BUTTON (FAB) -->
                 <div class="flex flex-col items-center justify-center -mt-5">
-                    <a href="{{ route('scan.index', ['camera' => 1]) }}"
-                       onclick="if ((window.location.pathname.endsWith('/scan') || window.location.pathname.indexOf('/scan') !== -1) && typeof startCameraScanner === 'function') { event.preventDefault(); startCameraScanner(true); return false; }"
-                       title="Buka Terminal Scan Barcode & Langsung Nyalakan Kamera"
+                    <button type="button"
+                       onclick="handleCenterScanClick(event)"
+                       title="Buka Menu Aksi Cepat Scan Barcode & Kamera"
                        class="group relative flex items-center justify-center w-13 h-13 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-400 text-white shadow-[0_0_20px_rgba(52,211,153,0.55)] border-2 border-emerald-300/80 transition-transform active:scale-90 hover:scale-105">
                         <div class="absolute inset-0 rounded-full bg-emerald-400/30 animate-ping pointer-events-none"></div>
                         <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="{{ $menuSections['Operasional Utama'][1]['icon'] }}"/>
                         </svg>
-                    </a>
+                    </button>
                     <span class="text-[9px] font-extrabold uppercase font-mono-code text-emerald-400 mt-1 leading-none">SCAN</span>
                 </div>
 
@@ -1139,6 +1209,44 @@
             </div>
         </div>
     </div>
+
+    <!-- UI/UX Pro Max: Micro-Haptic & Mobile Quick Hub Scripts -->
+    <script>
+        function handleCenterScanClick(e) {
+            if ((window.location.pathname.endsWith('/scan') || window.location.pathname.indexOf('/scan') !== -1) && typeof startCameraScanner === 'function') {
+                startCameraScanner(true);
+                return;
+            }
+            toggleMobileQuickHub(e);
+        }
+
+        function toggleMobileQuickHub(e) {
+            if (e) e.stopPropagation();
+            const hub = document.getElementById('mobile-quick-hub');
+            const backdrop = document.getElementById('mobile-quick-hub-backdrop');
+            if (!hub) return;
+            const isHidden = hub.classList.contains('hidden');
+            if (isHidden) {
+                hub.classList.remove('hidden');
+                backdrop?.classList.remove('hidden');
+                if (navigator.vibrate) {
+                    try { navigator.vibrate(30); } catch (err) {}
+                }
+            } else {
+                hub.classList.add('hidden');
+                backdrop?.classList.add('hidden');
+            }
+        }
+
+        // Global Micro-Haptic Tactile Feedback on Mobile
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('button, a[href*="scan"], a[href*="handovers"], a[href*="items"], .btn');
+            if (btn && navigator.vibrate) {
+                try { navigator.vibrate(25); } catch (err) {}
+            }
+        }, { passive: true });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

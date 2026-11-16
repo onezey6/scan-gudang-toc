@@ -5,52 +5,77 @@
 @section('page_subtitle', 'Visualisasi real-time stok gudang, mutasi scan barcode masuk/keluar, berita acara, dan aktivitas petugas')
 
 @section('content')
-    <!-- Hero Banner Bergradasi Modern -->
-    <div class="mb-6 relative overflow-hidden p-5 sm:p-7 rounded-3xl bg-gradient-to-br from-[#0B1120] via-[#0F172A] to-emerald-950 text-white shadow-xl border border-slate-800">
-        <div class="pointer-events-none absolute -right-16 -top-16 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl"></div>
-
-        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+    <!-- Hero Bento Grid Modern (UI/UX Pro Max) -->
+    <div class="mb-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Main Hero Card (Col-Span-8) -->
+        <div class="lg:col-span-8 relative overflow-hidden p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#0B1120] via-[#0F172A] to-emerald-950/80 text-white shadow-xl border border-slate-800 flex flex-col justify-between">
+            <div class="pointer-events-none absolute -right-16 -top-16 w-72 h-72 rounded-full bg-emerald-500/15 blur-3xl"></div>
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-2.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>SISTEM PENYIMPANAN & SCANNER REAL-TIME AKTIF</span>
+                <div class="flex items-center justify-between gap-2 flex-wrap mb-2.5">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span>SISTEM PENYIMPANAN & SCANNER REAL-TIME AKTIF</span>
+                    </div>
+                    <span class="text-[11px] font-mono font-semibold text-cyan-400 bg-cyan-950/50 border border-cyan-800/40 px-2.5 py-0.5 rounded-full">
+                        {{ auth()->user()->isSuperAdmin() ? '👑 Super Admin' : (auth()->user()->isAdmin() ? 'Admin Logistik' : 'Petugas / Staff') }}
+                    </span>
                 </div>
                 <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">
                     Selamat bertugas, {{ auth()->user()->name }}!
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                    Jabatan: <strong class="text-white">{{ auth()->user()->job_title ?: 'Petugas Logistik' }}</strong> ({{ auth()->user()->department ?: 'Divisi Logistik' }}). Seluruh penambahan barang, scan barcode masuk/keluar, dan berita acara tercatat otomatis atas nama Anda.
+                    Jabatan: <strong class="text-white">{{ auth()->user()->job_title ?: 'Petugas Logistik' }}</strong> ({{ auth()->user()->department ?: 'Divisi Logistik' }}). Seluruh pencatatan barang, mutasi barcode, dan berita acara terdata secara otomatis.
                 </p>
             </div>
 
-            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5">
+            <div class="mt-4 pt-3.5 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-3 text-xs text-slate-400">
+                <div class="flex items-center gap-4">
+                    <span>Total SKU: <strong class="text-emerald-400 font-bold">{{ number_format($stats['total_items']) }}</strong></span>
+                    <span>Total Fisik: <strong class="text-cyan-400 font-bold">{{ number_format($stats['total_stock']) }} Unit</strong></span>
+                </div>
+                <div class="text-[11px] text-slate-400 flex items-center gap-1.5 font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Shift Siaga 24 Jam</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Action Hub Tile (Col-Span-4) -->
+        <div class="lg:col-span-4 p-5 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Aksi Cepat Gudang</span>
+                <span class="text-[10px] text-emerald-400 font-mono font-bold">1-Klik</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
                 <a href="{{ route('scan.index', ['mode' => 'in']) }}"
-                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-950/50 transition-all">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Scan Masuk</span>
+                   class="group p-3 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white shadow-lg shadow-emerald-950/40 border border-emerald-400/30 transition-all text-left">
+                    <div class="flex items-center justify-between text-emerald-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        <span class="text-[9px] uppercase font-bold tracking-wider">Inbound</span>
+                    </div>
+                    <div class="text-xs font-extrabold text-white mt-1.5">Scan Masuk</div>
                 </a>
+
                 <a href="{{ route('scan.index', ['mode' => 'out']) }}"
-                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-950/30 transition-all">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                    </svg>
-                    <span>Scan Keluar</span>
+                   class="group p-3 rounded-2xl bg-gradient-to-br from-amber-600 to-orange-700 hover:from-amber-500 hover:to-orange-600 active:scale-95 text-slate-950 shadow-lg shadow-amber-950/40 border border-amber-400/30 transition-all text-left">
+                    <div class="flex items-center justify-between text-amber-950">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        <span class="text-[9px] uppercase font-bold tracking-wider">Outbound</span>
+                    </div>
+                    <div class="text-xs font-extrabold text-white mt-1.5">Scan Keluar</div>
                 </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
                 <a href="{{ route('items.barcode-studio') }}"
-                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur transition-all">
-                    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h2v12H4V6zm4 0h1v12H8V6zm3 0h3v12h-3V6zm5 0h1v12h-1V6zm3 0h1v12h-1V6z"/>
-                    </svg>
-                    <span>Studio Barcode</span>
+                   class="py-2 px-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 border border-slate-700 text-slate-200 text-xs font-semibold text-center transition-all flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h2v12H4V6zm4 0h1v12H8V6zm3 0h3v12h-3V6zm5 0h1v12h-1V6zm3 0h1v12h-1V6z"/></svg>
+                    <span>Studio Label</span>
                 </a>
                 <a href="{{ route('handovers.create', ['type' => 'bast']) }}"
-                   class="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs sm:text-sm font-semibold backdrop-blur transition-all">
-                    <svg class="w-4 h-4 text-teal-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span>Buat BAST/BAP</span>
+                   class="py-2 px-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 active:scale-95 border border-slate-700 text-teal-300 text-xs font-semibold text-center transition-all flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span>Buat BAST</span>
                 </a>
             </div>
         </div>
