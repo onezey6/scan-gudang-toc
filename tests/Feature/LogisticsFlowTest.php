@@ -381,7 +381,7 @@ class LogisticsFlowTest extends TestCase
         $user = User::where('email', 'admin@logiscan.id')->firstOrFail();
         $this->actingAs($user);
 
-        $fakeImage = UploadedFile::fake()->image('my-photo.jpg', 200, 200);
+        $fakeImage = UploadedFile::fake()->create('my-photo.jpg', 200, 'image/jpeg');
 
         $res = $this->put('/profile', [
             'name' => $user->name,
@@ -521,5 +521,77 @@ class LogisticsFlowTest extends TestCase
         $resDash->assertStatus(200);
         $resDash->assertSee('Radar Pengingat:');
         $resDash->assertSee('Peminjam Telat');
+    }
+
+    public function test_role_hierarchy_and_user_deletion_exclusive_to_super_admin(): void
+    {
+        $superAdmin = User::where('username', 'admin')->firstOrFail();
+        $this->assertTrue($superAdmin->isSuperAdmin());
+        $this->assertTrue($superAdmin->isAdmin());
+        $this->assertFalse($superAdmin->isStaff());
+        $this->assertTrue($superAdmin->canDeleteUser());
+
+        // 1. Buat User Admin Biasa & Staff untuk pengujian
+        $adminBiasa = User::firstOrCreate(
+            ['username' => 'test.admin.biasa'],
+            [
+                'name' => 'Admin Biasa Test',
+                'email' => 'adminbiasa@logiscan.id',
+                'role' => 'admin',
+                'password' => bcrypt('password123'),
+                'is_active' => true,
+            ]
+        );
+        $this->assertFalse($adminBiasa->isSuperAdmin());
+        $this->assertTrue($adminBiasa->isAdmin());
+        $this->assertFalse($adminBiasa->canDeleteUser());
+
+        $staffUser = User::firstOrCreate(
+            ['username' => 'test.staff.target'],
+            [
+                'name' => 'Staff Target Hapus',
+                'email' => 'stafftarget@logiscan.id',
+                'role' => 'staff',
+                'password' => bcrypt('password123'),
+                'is_active' => true,
+            ]
+        );
+
+        // 2. Uji: Admin Biasa DILARANG menghapus user (harus 403 Forbidden)
+        $this->actingAs($adminBiasa);
+        $resForbidden = $this->delete(route('profile.users.destroy', $staffUser));
+        $resForbidden->assertStatus(403);
+        $this->assertFalse($staffUser->fresh()->trashed());
+
+        // 3. Uji: Admin Biasa DILARANG membuat akun ber-role super_admin
+        $resCreateSuper = $this->post(route('profile.users.store'), [
+            'name' => 'Fake Super Admin',
+            'username' => 'fake.super',
+            'email' => 'fakesuper@logiscan.id',
+            'password' => 'password123',
+            'role' => 'super_admin',
+        ]);
+        $resCreateSuper->assertSessionHasErrors('role');
+
+        // 4. Uji: Super Admin DILARANG menghapus akunnya sendiri
+        $this->actingAs($superAdmin);
+        $resSelfDel = $this->delete(route('profile.users.destroy', $superAdmin));
+        $resSelfDel->assertSessionHasErrors('user');
+        $this->assertFalse($superAdmin->fresh()->trashed());
+
+        // 5. Uji: Super Admin BERHASIL menghapus user target (Soft Delete)
+        $resDelStaff = $this->delete(route('profile.users.destroy', $staffUser));
+        $resDelStaff->assertRedirect();
+        $this->assertTrue($staffUser->fresh()->trashed());
+
+        // 6. Uji: Halaman Profil menampilkan badge dan tombol hapus dengan benar
+        $resProfile = $this->get(route('profile.edit'));
+        $resProfile->assertStatus(200);
+        $resProfile->assertSee('👑 Super Admin');
+        $resProfile->assertSee('Hapus Akun Pengguna (Hanya Super Admin)');
+
+        // Bersihkan dummy users
+        $adminBiasa->forceDelete();
+        $staffUser->forceDelete();
     }
 }

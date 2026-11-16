@@ -16,12 +16,13 @@ ZONA ATAS: SPESIFIKASI KEBUTUHAN PRODUK (BLUEPRINT AWAL)
 ---
 
 ## 2. Peran Pengguna (Role & Hak Akses)
-Sistem mendukung **2 peran pengguna** dengan pembagian hak akses yang jelas:
+Sistem mendukung **3 tingkatan peran pengguna (Role-Based Access Control / RBAC)** dengan pembagian hak akses dan otorisasi yang tegas:
 
 | Peran (Role) | Kode Role | Hak Akses & Tanggung Jawab Utama |
 | :--- | :--- | :--- |
-| **Admin Logistik** | `admin` | Akses penuh ke seluruh modul: Dashboard Analitik, Master Barang & Studio Pembuat Barcode, Scan Barcode Masuk/Keluar, Berita Acara (BAST & BAP), Laporan & Export (PDF/Excel), Manajemen Akun User/Petugas, History Akses Web (Audit Log Login/Logout), dan Pengaturan Profil. |
-| **Petugas / Staff** | `staff` | Akses operasional harian: Dashboard, Tambah/Lihat Barang (tercatat otomatis sebagai pembuat barang), Studio Cetak Barcode, Scan Barcode Masuk/Keluar (tercatat otomatis sebagai petugas scan), Buat & Cetak Berita Acara (BAST & BAP), Lihat Laporan Transaksi, dan Pengaturan Profil Pribadi. |
+| **Super Admin** | `super_admin` | **Pemegang Otoritas Tertinggi:** Hak akses total ke seluruh sistem. **Satu-satunya peran yang berhak MENGHAPUS AKUN USER (Delete User)** dengan proteksi *anti-self delete* dan *Soft Deletes*. Berwenang menambah akun semua role (termasuk sesama Super Admin), mengubah status akun, unduh backup database (disaster recovery), dan memantau seluruh aktivitas log. |
+| **Admin Logistik** | `admin` | **Pengelola Operasional Gudang:** Akses ke Dashboard Analitik, Master Barang & Studio Pembuat Barcode, Scan Barcode Masuk/Keluar, Berita Acara (BAST & BAP), Menu Sampah (Recycle Bin), Laporan & Export (PDF/Excel), History Akses Web & Titik GPS, serta Manajemen Petugas (tambah & aktif/nonaktifkan akun). **DILARANG MENGHAPUS AKUN USER** (tombol tidak tersedia & dilindungi otorisasi 403). |
+| **Petugas / Staff** | `staff` | **Operator Lapangan Gudang:** Akses operasional harian terfokus: Dashboard ringkas, Tambah Barang Baru (tercatat otomatis sebagai pembuat), Studio Cetak Barcode, Scan Barcode Masuk/Keluar (tercatat otomatis sebagai petugas scan), Buat & Cetak Berita Acara (BAST & BAP), Lihat Laporan Transaksi, dan Pengaturan Profil Pribadi. *(Tidak memiliki akses ke manajemen akun, sampah, atau audit log).* |
 
 ---
 
@@ -430,5 +431,12 @@ ZONA BAWAH: MASTER CONTEXT & LOGIKA SISTEM TERKINI (LIVING CONTEXT)
   3. **Audio Feedback Scanner (Web Audio API):** Mengimplementasikan audio synthesizer murni peramban (tanpa beban file eksternal) yang menghasilkan suara *Chime Beep* (880Hz-1760Hz) saat barcode berhasil di-scan dan suara *Buzzer* (220Hz) saat barcode tidak terdaftar atau eror.
   4. **Pencadangan Database 1-Klik untuk Admin:** Engine dumper SQL berbasis PDO murni (`BackupController`) di rute `/settings/backup-database` yang menghasilkan file cadangan `.sql` lengkap seluruh tabel (DDL & DML) untuk pemulihan bencana (*disaster recovery*).
   5. **Cetak Kartu Kendali Stok per Barang (Stock Ledger Card):** Halaman cetak resmi berstandar kedinasan (`/items/{item}/stock-card`) yang memuat profil barang, barcode visual, tabel kronologis seluruh mutasi (masuk, keluar, pihak terkait, saldo sisa), dan kolom pengesahan tanda tangan ganda.
+- **2026-11-16 (Implementasi Hierarki 3 Role: Super Admin, Admin, Petugas & Fitur Hapus User Eksklusif Super Admin):**
+  1. **Tingkatan Peran RBAC (3-Tier Roles):** Mengembangkan hierarki peran menjadi 3 tingkatan formal: **Super Admin (`super_admin`)**, **Admin Logistik (`admin`)**, dan **Petugas Gudang (`staff`)**. Akun `admin` default otomatis dipromosikan statusnya menjadi Super Admin.
+  2. **Fitur Hapus User (Eksklusif Super Admin):** Menambahkan route `DELETE /profile/users/{targetUser}` dan method `destroyUser` di `ProfileController`. Tombol dan aksi hapus pengguna diproteksi 100% hanya dapat dieksekusi oleh Super Admin (Admin biasa dan Staff diblokir dengan status `403 Forbidden`).
+  3. **Proteksi Anti-Self Delete & Integritas Basis Data:** Super Admin dicegah menghapus akun miliknya sendiri yang sedang aktif dan dicegah menghapus Super Admin terakhir pada sistem. Seluruh penghapusan akun menggunakan mekanisme *Soft Deletes* (`deleted_at`) pada tabel `users` sehingga relasi riwayat barang, scan barcode, dan dokumen berita acara lampau tetap utuh dan sah secara hukum kedinasan.
+  4. **Antarmuka Manajemen Akun & Badge Multi-Role:** Menambahkan opsi pembuatan Super Admin pada formulir pendaftaran akun (hanya terlihat oleh Super Admin), memperbarui badge identitas peran di tabel profil (Ungu Emas untuk Super Admin, Slate Navy untuk Admin, Emerald untuk Staff), serta tombol merah berikon tempat sampah dengan dialog konfirmasi keamanan interaktif.
+  5. **Penyelarasan Tampilan Navigasi:** Memperbarui kartu identitas operator di Sidebar Desktop dan Drawer Ponsel (`resources/views/layouts/app.blade.php`) agar menampilkan gelar kehormatan `👑 Super Admin` secara proporsional.
+
 
 

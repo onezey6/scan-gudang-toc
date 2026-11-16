@@ -36,13 +36,13 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        // 1. Buat Akun Pengguna (Admin & Petugas Logistik)
+        // 1. Buat Akun Pengguna (Super Admin & Petugas Logistik)
         $admin = User::create([
             'name' => 'Budi Santoso',
             'username' => 'admin',
             'email' => 'admin@logiscan.id',
             'employee_id' => 'NIP-LOG-001',
-            'role' => 'admin',
+            'role' => 'super_admin',
             'job_title' => 'Kepala Gudang & Logistik',
             'department' => 'Divisi Logistik & Inventaris',
             'phone' => '0812-3456-7890',

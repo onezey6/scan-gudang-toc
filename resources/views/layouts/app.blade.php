@@ -463,9 +463,9 @@
                     <div class="min-w-0 flex-1">
                         <div class="text-[10px] font-mono-code text-cyan-400 cyber-only">OPERATOR</div>
                         <div class="text-sm font-bold text-white leading-tight truncate">{{ auth()->user()->name }}</div>
-                        <div class="text-[11px] text-emerald-400 font-semibold mt-0.5 flex items-center gap-1.5">
-                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span>{{ auth()->user()->isAdmin() ? 'Admin Logistik' : 'Petugas / Staff' }}</span>
+                        <div class="text-[11px] {{ auth()->user()->isSuperAdmin() ? 'text-amber-400' : 'text-emerald-400' }} font-semibold mt-0.5 flex items-center gap-1.5">
+                            <span class="inline-block w-1.5 h-1.5 rounded-full {{ auth()->user()->isSuperAdmin() ? 'bg-amber-400' : 'bg-emerald-400' }}"></span>
+                            <span>{{ auth()->user()->isSuperAdmin() ? '👑 Super Admin' : (auth()->user()->isAdmin() ? 'Admin Logistik' : 'Petugas / Staff') }}</span>
                         </div>
                     </div>
                 </div>
@@ -567,7 +567,7 @@
                         @endif
                         <div class="text-left leading-tight">
                             <div class="text-xs font-bold text-slate-900">{{ auth()->user()->name }}</div>
-                            <div class="text-[10px] text-slate-400 font-medium">{{ auth()->user()->isAdmin() ? 'Admin' : 'Staff' }}</div>
+                            <div class="text-[10px] text-slate-400 font-medium">{{ auth()->user()->isSuperAdmin() ? 'Super Admin' : (auth()->user()->isAdmin() ? 'Admin' : 'Staff') }}</div>
                         </div>
                     </a>
 

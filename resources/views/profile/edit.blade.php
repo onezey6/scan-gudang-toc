@@ -175,71 +175,121 @@
         <div class="lg:col-span-5 space-y-6">
             @if ($user->isAdmin())
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-                    <div class="p-4 sm:p-5 bg-slate-900 text-white">
-                        <h3 class="text-sm font-bold">Manajemen Akun Petugas (Khusus Admin)</h3>
-                        <p class="text-xs text-slate-300 mt-0.5">Tambahkan akun petugas baru agar setiap orang punya log tambah & scan barang masing-masing</p>
+                    <div class="p-4 sm:p-5 {{ $user->isSuperAdmin() ? 'bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 border-b border-purple-500/30' : 'bg-slate-900' }} text-white">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold flex items-center gap-2">
+                                @if ($user->isSuperAdmin())
+                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-400 text-slate-950 text-xs">👑</span>
+                                    <span>Manajemen Akun Pengguna (Super Admin)</span>
+                                @else
+                                    <span>Manajemen Akun Petugas (Admin Logistik)</span>
+                                @endif
+                            </h3>
+                            @if ($user->isSuperAdmin())
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">Otoritas Penuh</span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-slate-300 mt-1">
+                            @if ($user->isSuperAdmin())
+                                Kelola seluruh akun, tambah hak akses Super Admin/Admin/Staff, serta hapus akun pengguna.
+                            @else
+                                Tambahkan akun petugas baru agar setiap orang punya log tambah & scan barang masing-masing.
+                            @endif
+                        </p>
                     </div>
 
                     <form action="{{ route('profile.users.store') }}" method="POST" class="p-4 sm:p-5 space-y-3 border-b border-slate-200">
                         @csrf
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Nama Petugas *</label>
-                                <input type="text" name="name" required placeholder="Nama lengkap" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Nama Lengkap *</label>
+                                <input type="text" name="name" required placeholder="Nama lengkap" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Username *</label>
-                                <input type="text" name="username" required placeholder="username.staff" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                                <input type="text" name="username" required placeholder="username.petugas" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Email *</label>
-                                <input type="email" name="email" required placeholder="staff@logiscan.id" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                                <input type="email" name="email" required placeholder="petugas@logiscan.id" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Password *</label>
-                                <input type="password" name="password" value="password123" required class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                                <input type="password" name="password" value="password123" required class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Peran (Role)</label>
-                                <select name="role" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-white">
-                                    <option value="staff">Petugas / Staff</option>
-                                    <option value="admin">Admin Logistik</option>
+                                <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Peran (Role) *</label>
+                                <select name="role" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    <option value="staff">Petugas / Staff (Operator Gudang)</option>
+                                    <option value="admin">Admin Logistik (Pengelola Gudang)</option>
+                                    @if ($user->isSuperAdmin())
+                                        <option value="super_admin">👑 Super Admin (Otoritas Tertinggi)</option>
+                                    @endif
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold uppercase text-slate-600 mb-1">Jabatan</label>
-                                <input type="text" name="job_title" value="Petugas Gudang Logistik" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs">
+                                <input type="text" name="job_title" value="Petugas Gudang Logistik" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                             </div>
                         </div>
-                        <button type="submit" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold">
+                        <button type="submit" class="w-full py-2 rounded-xl {{ $user->isSuperAdmin() ? 'bg-purple-700 hover:bg-purple-800' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white text-xs font-semibold shadow-xs transition-colors">
                             + Tambah Akun Pengguna Baru
                         </button>
                     </form>
 
                     <div class="divide-y divide-slate-100 max-h-80 overflow-y-auto">
                         @foreach ($allUsers as $u)
-                            <div class="p-3.5 flex items-center justify-between gap-2">
-                                <div>
-                                    <div class="text-xs font-bold text-slate-900">
-                                        {{ $u->name }}
-                                        <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] uppercase {{ $u->isAdmin() ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700' }}">
-                                            {{ $u->role }}
-                                        </span>
+                            <div class="p-3.5 flex items-center justify-between gap-2 hover:bg-slate-50/70 transition-colors">
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-xs font-bold text-slate-900 flex items-center flex-wrap gap-1.5">
+                                        <span class="truncate">{{ $u->name }}</span>
+                                        @if ($u->isSuperAdmin())
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-950 text-purple-200 border border-purple-500/40 shadow-xs">
+                                                <svg class="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                                Super Admin
+                                            </span>
+                                        @elseif ($u->role === 'admin')
+                                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase bg-slate-900 text-white">
+                                                Admin
+                                            </span>
+                                        @else
+                                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                Staff
+                                            </span>
+                                        @endif
+                                        @if ($u->id === $user->id)
+                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-medium bg-blue-100 text-blue-800 border border-blue-200">Anda</span>
+                                        @endif
                                     </div>
-                                    <div class="text-[11px] text-slate-500">{{ $u->email }} • {{ $u->job_title }}</div>
+                                    <div class="text-[11px] text-slate-500 truncate">{{ $u->email }} • {{ $u->job_title }}</div>
                                     <div class="text-[11px] text-emerald-700 font-medium mt-0.5">
                                         Tambah Barang: <strong>{{ $u->created_items_count }}</strong> • Scan: <strong>{{ $u->stock_movements_count }}x</strong> • BAST/BAP: <strong>{{ $u->handover_documents_count }}</strong>
                                     </div>
                                 </div>
-                                @if ($u->id !== $user->id)
-                                    <form action="{{ route('profile.users.toggle', $u) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold {{ $u->is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
-                                            {{ $u->is_active ? 'Aktif' : 'Nonaktif' }}
-                                        </button>
-                                    </form>
-                                @endif
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    @if ($u->id !== $user->id && (!$u->isSuperAdmin() || $user->isSuperAdmin()))
+                                        <form action="{{ route('profile.users.toggle', $u) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors {{ $u->is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100' }}" title="Ubah status akun">
+                                                {{ $u->is_active ? 'Aktif' : 'Nonaktif' }}
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    {{-- Tombol HAPUS AKUN: EKSKLUSIF HANYA UNTUK SUPER ADMIN --}}
+                                    @if ($user->isSuperAdmin() && $u->id !== $user->id)
+                                        <form action="{{ route('profile.users.destroy', $u) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin MENGHAPUS akun pengguna \'{{ addslashes($u->name) }}\'? Tindakan ini bersifat permanen dan hanya dapat dilakukan oleh Super Admin.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 border border-rose-200 transition-colors" title="Hapus Akun Pengguna (Hanya Super Admin)">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </div>
                         @endforeach
                     </div>

@@ -107,14 +107,16 @@ class ProfileController extends Controller
     public function storeUser(Request $request)
     {
         $admin = Auth::user();
-        abort_unless($admin && $admin->isAdmin(), 403, 'Hanya Admin yang dapat menambahkan akun petugas baru.');
+        abort_unless($admin && $admin->isAdmin(), 403, 'Hanya Administrator yang dapat menambahkan akun pengguna baru.');
+
+        $allowedRoles = $admin->isSuperAdmin() ? ['super_admin', 'admin', 'staff'] : ['admin', 'staff'];
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'username' => ['required', 'string', 'max:100', 'unique:users,username'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
             'employee_id' => ['nullable', 'string', 'max:60'],
-            'role' => ['required', 'in:admin,staff'],
+            'role' => ['required', 'in:' . implode(',', $allowedRoles)],
             'job_title' => ['nullable', 'string', 'max:120'],
             'department' => ['nullable', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:40'],
@@ -153,6 +155,11 @@ class ProfileController extends Controller
             return back()->withErrors(['user' => 'Anda tidak dapat menonaktifkan akun Anda sendiri.']);
         }
 
+        // Admin biasa tidak boleh menonaktifkan Super Admin
+        if ($targetUser->isSuperAdmin() && !$admin->isSuperAdmin()) {
+            abort(403, 'Admin biasa tidak memiliki wewenang untuk menonaktifkan Super Admin.');
+        }
+
         $targetUser->update([
             'is_active' => !$targetUser->is_active,
         ]);
@@ -160,12 +167,48 @@ class ProfileController extends Controller
         $statusLabel = $targetUser->is_active ? 'mengaktifkan' : 'menonaktifkan';
         AccessLog::record(
             'activity',
-            "Admin {$statusLabel} akun pengguna: {$targetUser->name}",
+            "Admin ({$admin->name}) {$statusLabel} akun pengguna: {$targetUser->name}",
             $admin,
             $request
         );
 
         return back()->with('success', "Status akun \"{$targetUser->name}\" berhasil diperbarui.");
+    }
+
+    public function destroyUser(Request $request, User $targetUser)
+    {
+        $admin = Auth::user();
+        abort_unless($admin && $admin->isSuperAdmin(), 403, 'Akses ditolak: Hanya Super Admin yang berhak menghapus akun pengguna.');
+
+        if ($targetUser->id === $admin->id) {
+            return back()->withErrors(['user' => 'Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif digunakan.']);
+        }
+
+        // Pastikan tidak menghapus Super Admin terakhir
+        if ($targetUser->isSuperAdmin()) {
+            $otherSuperAdminsCount = User::where('role', 'super_admin')
+                ->where('id', '!=', $targetUser->id)
+                ->count();
+
+            if ($otherSuperAdminsCount < 1) {
+                return back()->withErrors(['user' => 'Tidak dapat menghapus akun Super Admin terakhir pada sistem.']);
+            }
+        }
+
+        $userName = $targetUser->name;
+        $userEmail = $targetUser->email;
+        $userRole = $targetUser->role;
+
+        $targetUser->delete(); // Soft delete aman
+
+        AccessLog::record(
+            'activity',
+            "Super Admin ({$admin->name}) menghapus akun pengguna: {$userName} ({$userEmail} - Role: " . strtoupper($userRole) . ")",
+            $admin,
+            $request
+        );
+
+        return back()->with('success', "Akun pengguna \"{$userName}\" berhasil dihapus.");
     }
 
     private function handleAvatarUpload(Request $request): ?string

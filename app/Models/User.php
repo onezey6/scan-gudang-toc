@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -54,9 +55,33 @@ class User extends Authenticatable
         ];
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['super_admin', 'admin'], true);
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff';
+    }
+
+    public function canDeleteUser(): bool
+    {
+        return $this->isSuperAdmin();
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return match ($this->role) {
+            'super_admin' => 'Super Admin',
+            'admin' => 'Admin Logistik',
+            default => 'Petugas Gudang',
+        };
     }
 
     public function createdItems(): HasMany
