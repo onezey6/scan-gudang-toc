@@ -32,7 +32,7 @@ class TelegramPollCommand extends Command
 
         while (true) {
             try {
-                $response = Http::timeout($timeout + 5)->get("https://api.telegram.org/bot{$botToken}/getUpdates", [
+                $response = Http::withoutVerifying()->timeout($timeout + 5)->get("https://api.telegram.org/bot{$botToken}/getUpdates", [
                     'offset' => $offset,
                     'timeout' => $timeout,
                 ]);

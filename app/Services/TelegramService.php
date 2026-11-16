@@ -58,7 +58,7 @@ class TelegramService
                 $payload['reply_markup'] = json_encode($replyMarkup);
             }
 
-            $response = Http::timeout(8)->post($url, $payload);
+            $response = Http::withoutVerifying()->timeout(8)->post($url, $payload);
 
             if ($response->successful()) {
                 return $response->json();
